@@ -16,7 +16,7 @@ How?
 
 To apply this to your project, simply place 'configure' in your projects root directory.
 
-All its required configuration is done in a new file 'configure.cfg' your create.
+All its required configuration is done in a new file **configure.cfg** your create.
 
 First of all, you need to name it with:
 
@@ -27,7 +27,7 @@ But be aware that what you set for APP will be used for path structures, such as
 Now regarding the actual installation.
 
 As a 'general purpose slash-hammer solution' it expects to be for 'system-wide installations' 
-and therefor 'make-install' requires root access.
+and therefor **make-install** requires root access.
 
 To define what files or folders shall me installed somewhere, simply write its option-name in capitals,
 followed by either a file or folder name.
@@ -51,7 +51,7 @@ To create a reference file, which contains the assigned paths:
 
 	doRef=true
 
-Which then will write the file '$APP\_ref.conf' which will be automaticly installed to SYSCONFDIR (/etc).
+Which then will write the file **$APP\_ref.conf** which will be automaticly installed to SYSCONFDIR (/etc).
 
 
 So, the final example could look like:
