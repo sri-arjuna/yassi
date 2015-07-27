@@ -43,12 +43,12 @@ Install multiple folders:
 To create a reference file, which contains the assigned paths:
 	doRef=true
 
+Which then will write the file '$APP\_ref.conf' which will be automaticly installed to SYSCONFDIR (/etc).
 
 
-
-Final example:
+So, the final example could look like:
 	APP=project-name
 	BINDIR=bin
 	DOCDIR=README.md
 	DATADIR="./templates ./samples"
- 
+	doRef=true
