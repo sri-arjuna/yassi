@@ -1,18 +1,34 @@
 Yet Another Automated Script Installation (yaasi)
 =================================================
 
-Why?
-----
 
-If you have a script based project you would like to distribute, 
-with this simple tool you can handle a most basic installation for GNU/Linux compliant distrobutions.
+What does it do?
+----------------
 
 Inspired by GNU Autoconf & Automake, but quite overhelmed by its power, 
 i wrote this to ease the task of writing repeative installation handlers.
 
+Which i found quite challenging and annoying to place so many files in so many directories.
 
-How?
-----
+It is a simple installer, based upon a simple config file usage.
+
+
+What is it for?
+---------------
+
+It is for small projects, or script based projects that do not require to be complied for a specific architecture, 
+or contain just plain text files or only multimedia binaries.
+
+
+Why is the file not named 'yaasi'?
+----------------------------------
+
+As people like to meet what they already know or expect, i named it **configure** instead, 
+generating a script named **make-install**
+
+
+Config configure
+----------------
 
 To apply this to your project, simply place 'configure' in your projects root directory.
 
