@@ -1,0 +1,184 @@
+#!/bin/sh
+#
+#	Description:	Generates a simple 'make-install' script 
+#			a basic FHS conform installation
+#
+#	Created:	2015.07.27
+#	Changed:	2015.07.27
+	script_name=./configure
+	script_version=0.2
+#
+# ------------------------------------------------------------------------
+#
+# Copyright (c) 2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
+# ------------------------------------------------------------------------
+#
+#	Internal Variables
+#
+	APP=""
+	doRef=false
+	unset FHS
+	OUTPUT="make-install"
+	SOURCE="${script_name}.cfg"
+	declare -A FHS
+	index_list="prefix bindir sbindir sysconfdir datarootdir datadir docdir infodir man1dir man8dir compldir"
+	variable_list="PREFIX BINDIR SBINDIR SYSCONFDIR DATAROOTDIR DATADIR DOCDIR INFODIR MAN1DIR MAN8DIR COMPLDIR"
+	source "$SOURCE" ; [ -z "$APP" ] && exit 1
+	REFERENCE="${APP}_ref.conf"
+#
+#	Functions
+#
+	show_help() {
+	# Prints the helpscreen
+	# and exits
+		MSG_TR_HELP="Usage:	$script_name [options]
+Options:
+	-h|--help		Shows this screen and exits
+	--version		Shows the version and exits
+	
+	--prefix DIR		Sets the prefix to DIR		(default: /usr/local)
+	--bindir DIR		Sets the bindir to DIR 		(\$PREFIX/bin)
+	--sbindir DIR		Sets the sbindir to DIR 	(\$PREFIX/sbin)
+	--sysconfdir DIR	Sets the sysconfdir to DIR 	(\$PREFIX/etc)
+	
+	--datarootdir DIR	Sets the datarootdir to DIR 	(\$PREFIX/share)
+	--datadir DIR		Sets the datadir to DIR 	(\$DATAROOTDIR/$APP)
+	--docdir DIR		Sets the docdir to DIR 		(\$DATAROOTDIR/doc/$APP)
+	
+	--infodir DIR		Sets the infodir to DIR 	(\$DATAROOTDIR/info)
+	--man1dir DIR		Sets the mandir to DIR 		(\$DATAROOTDIR/man/man1)
+	--man8dir DIR		Sets the mandir to DIR 		(\$DATAROOTDIR/man/man8)
+	
+	--compldir DIR		Sets the (bash)compldir to DIR 	(\$DATAROOTDIR/bash-completion/completions)
+	"
+		echo "$MSG_TR_HELP"
+		exit 99
+	}
+	show_version() {
+	# Prints the version of the script
+	# and exits
+		MSG_TR_VERSION="(sea) $script_name, Version $script_version
+Copyright (C) $(date +'%Y') Simon Arjuna, Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+"
+		echo "$MSG_TR_VERSION"
+		exit 111
+	}
+	single() { # INDEX CONTENT
+	# Prints the copy commands
+	#
+		if [ -d "$2" ] && [ ! "./" = "${2:0:2}" ]
+		then	echo "cp -ar \"$2/\"* \"${FHS[${1,,}]}\"" | sed s,"//","/",g
+		elif [ -e  "$2" ]
+		then	echo "cp -ar \"$2\" \"${FHS[${1,,}]}\"" | sed s,"//","/",g
+		fi
+	}
+	double() { # INDEX
+	# Prints the index reference used
+	#
+		echo "${1}=${FHS[${1,,}]}"  | sed s,"//","/",g
+	}
+#
+#	Get options
+#
+	# -a|--alternative ; to allow longoptions with a single leading '-'
+	GETOPT=$(getopt \
+		--options	"h" \
+		--longoptions	"help,version,bindir:,sbindir:,prefix:,datarootdir:,bindir:,bindir:,bindir:,bindir:,bindir:,bindir:" \
+		--name 		"${0##*/}" -- "${@}"
+	)
+	eval set -- "$GETOPT"
+	while true
+	do 	case "$1" in
+		-h|--help)	show_help	;;
+		--version)	show_version	;;
+		--prefix|--bindir|--sbindir|--datarootdir|\
+		--datadir|--infodir|--sysconfdir|--man1dir|--man8dir|--docdir|--compldir)
+				FHS["${1/--}"]="$2"
+				shift 2		;;
+		--)		shift ; break	;;
+		esac
+	done
+#
+#	Prepare paths
+#
+	for index in $index_list
+	do
+		tmp="${FHS[$index]}"
+		if [ -z "$tmp" ]
+		then	case "$index" in
+			prefix)		tmp="/usr/local"		;;
+			bindir)		tmp="${FHS[prefix]}/bin"	;;
+			sbindir)	tmp="${FHS[prefix]}/sbin"	;;
+			sysconfdir)	case "${FHS[prefix]}" in
+					"/"|"/usr")
+						tmp="/etc"		;;
+					*)	tmp="${FHS[prefix]}/etc";;
+					esac				;;
+			datarootdir)	tmp="${FHS[prefix]}/share"	;;
+			datadir)	tmp="${FHS[datarootdir]}/$APP"	;;
+			infodir)	tmp="${FHS[datarootdir]}/info"	;;
+			compldir)	tmp="${FHS[datarootdir]}/compl"	;;
+			man1dir)	tmp="${FHS[datarootdir]}/man/man1" ;;
+			man8dir)	tmp="${FHS[datarootdir]}/man/man8" ;;
+			docdir)		tmp="${FHS[datarootdir]}/doc/$APP" ;;
+			compldir)	tmp="${FHS[datarootdir]}/bash-completion/completions"
+			esac
+		fi
+		FHS["$index"]="$tmp"
+	done
+#
+#	Prepare installation script
+#
+	echo "#!/bin/sh" > "$OUTPUT"
+	echo "[ \$UID -ne 0 ] && echo \"This script requires root access.\" && exit 99" >> "$OUTPUT"
+	$doRef && >"$REFERENCE"
+	for index in $variable_list
+	do	tmp=$(awk -F= -v VAR="$index" '$1 ~ "^[^#]*" VAR "$"{print $2}' "$SOURCE")
+		num=$(echo $tmp | wc -w)
+		if [ "$num" -gt 0 ]
+		then	# It has content
+			case "$num" in
+			1)	echo "mkdir -p \"${FHS[${index,,}]}\"" >> "$OUTPUT"
+				single "$index" "$tmp" >> "$OUTPUT"
+				$doRef && double "$index" >> "$REFERENCE"
+				;;
+			*)	for s in $(echo "$tmp"|sed s,\",,g)
+				do 	echo "mkdir -p \"${FHS[${index,,}]}\"" >> "$OUTPUT"
+					single "$index" "$s" >> "$OUTPUT"
+				done
+				$doRef && double "$index" >> "$REFERENCE"
+				;;
+			esac
+		fi
+	done
+	$doRef && echo "cp $REFERENCE ${FHS[sysconfdir]}" >> "$OUTPUT"
+	# Finalize
+	echo "echo \"Finished installation of $APP with exit code: \$? (0=success)\"" >> "$OUTPUT"
+	chmod +x "$OUTPUT"
+#
+#	Output
+#
+	echo
+	echo "The installation script has been configured."
+	echo "To install \"$APP\" now, please execute: ./$OUTPUT"
+	echo
+	exit
