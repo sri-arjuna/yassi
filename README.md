@@ -64,7 +64,7 @@ Install all files of a folder:
 
 	BINDIR=bin	
 
-Install multiple folders:
+Install multiple folders (these will actualy copy the folder, not just its content):
 
 	DATADIR="./templates ./samples"
 
