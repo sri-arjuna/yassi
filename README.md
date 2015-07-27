@@ -27,32 +27,38 @@ As people like to meet what they already know or expect, i named it **configure*
 generating a script named **make-install**
 
 
-Config configure
-----------------
-
-To apply this to your project, simply place 'configure' in your projects root directory.
-
-All its required configuration is done in a new file **configure.cfg** your create.
-
-First of all, you need to name it with:
-
-	APP=project-name
-
-But be aware that what you set for APP will be used for path structures, such as /usr/share/$APP.
-
-Now regarding the actual installation.
+What does it require?
+---------------------
+* Shell (/bin/sh)
+* root access
 
 As a 'general purpose slash-hammer solution' it expects to be for 'system-wide installations' 
 and therefor **make-install** requires root access.
 
-To define what files or folders shall me installed somewhere, simply write its option-name in capitals,
-followed by either a file or folder name.
 
-One may pass multiple entries, in fact, passing a folder name will 'expand' to its content.
+Config configure
+----------------
+
+Make a file called **configure.cfg** with this example content, and place it along with **configure** in your **project root dir**.
+
+	APP=project-name
+	BINDIR=bin
+	DOCDIR=README.md
+	DATADIR="./templates ./samples"
+	doRef=true
+
+
+First line **APP=project-name** is required to get the proper naming for the path structures, such as **/usr/share/$APP**.
+
+The following **BINDIR,DOCDIR,DATADIR** show all the features available as of now.
+(*To define what files or folders shall me installed somewhere, simply write its option-name in capitals,
+followed by either a file or folder name.*)
 
 Install a file:
 
 	DOCDIR=README.md
+
+One may pass multiple entries, in fact, passing a folder name will 'expand' to its content.
 
 Install all files of a folder:
 
@@ -67,13 +73,4 @@ To create a reference file, which contains the assigned paths:
 
 	doRef=true
 
-Which then will write the file **$APP\_ref.conf** which will be automaticly installed to SYSCONFDIR (/etc).
-
-
-So, the final example could look like:
-
-	APP=project-name
-	BINDIR=bin
-	DOCDIR=README.md
-	DATADIR="./templates ./samples"
-	doRef=true
+Which then will write the file **$APP\_ref.conf** which will be automaticly installed to **SYSCONFDIR (/etc)**.
