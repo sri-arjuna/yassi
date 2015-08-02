@@ -1,4 +1,4 @@
-Yet Another Simple Script Installation (yaasi)
+Yet Another Simple Script Installation (yassi)
 ==============================================
 
 
