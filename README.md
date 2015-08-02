@@ -1,5 +1,5 @@
-Yet Another Automated Script Installation (yaasi)
-=================================================
+Yet Another Simple Script Installation (yaasi)
+==============================================
 
 
 What does it do?
