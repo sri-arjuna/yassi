@@ -1,12 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 #
 #	Description:	Generates a simple 'make-install' script 
 #			a basic FHS conform installation
 #
 #	Created:	2015.07.27
-#	Changed:	2015.07.27
+#	Changed:	2015.08.02
 	script_name=./configure
-	script_version=0.2
+	script_version=0.3
 #
 # ------------------------------------------------------------------------
 #
@@ -33,13 +33,11 @@
 	APP=""
 	doRef=false
 	unset FHS
-	OUTPUT="make-install"
-	SOURCE="${script_name}.cfg"
+	SOURCE="$0.cfg"
 	declare -A FHS
 	index_list="prefix bindir sbindir sysconfdir datarootdir datadir docdir infodir man1dir man8dir compldir"
-	variable_list="PREFIX BINDIR SBINDIR SYSCONFDIR DATAROOTDIR DATADIR DOCDIR INFODIR MAN1DIR MAN8DIR COMPLDIR"
-	source "$SOURCE" ; [ -z "$APP" ] && exit 1
-	REFERENCE="${APP}_ref.conf"
+	variable_list="";for i in $index_list;do variable_list+=" ${i^^}";done
+	
 #
 #	Functions
 #
@@ -63,7 +61,6 @@ Options:
 	--infodir DIR		Sets the infodir to DIR 	(\$DATAROOTDIR/info)
 	--man1dir DIR		Sets the mandir to DIR 		(\$DATAROOTDIR/man/man1)
 	--man8dir DIR		Sets the mandir to DIR 		(\$DATAROOTDIR/man/man8)
-	
 	--compldir DIR		Sets the (bash)compldir to DIR 	(\$DATAROOTDIR/bash-completion/completions)
 	"
 		echo "$MSG_TR_HELP"
@@ -82,19 +79,110 @@ There is NO WARRANTY, to the extent permitted by law.
 		echo "$MSG_TR_VERSION"
 		exit 111
 	}
-	single() { # INDEX CONTENT
-	# Prints the copy commands
+	write_files() { 
+	# Write the different types of make-{distclean,install,uninstall} scripts
 	#
-		if [ -d "$2" ] && [ ! "./" = "${2:0:2}" ]
-		then	echo "cp -ar \"$2/\"* \"${FHS[${1,,}]}\"" | sed s,"//","/",g
-		elif [ -e  "$2" ]
-		then	echo "cp -ar \"$2\" \"${FHS[${1,,}]}\"" | sed s,"//","/",g
+		write_install() { # INDEX CONTENT
+		# Prints the copy commands
+		#
+			echo "mkdir -p \"${FHS[${1,,}]}\""
+			if [ -d "$2" ] && [ ! "./" = "${2:0:2}" ]
+			then	echo "cp -ar \"$2/\"* \"${FHS[${1,,}]}\"" | sed s,"//","/",g
+			elif [ -e  "$2" ]
+			then	echo "cp -ar \"$2\" \"${FHS[${1,,}]}\"" | sed s,"//","/",g
+			fi
+		}
+		write_reference() { # INDEX
+		# Prints the index reference used
+		#
+			echo "${1}=${FHS[${1,,}]}"  | sed s,"//","/",g
+		}
+		write_uninstall() { # INDEX CONTENT
+		# Prints the remove commands
+		#
+			INDEX="$1" ; shift
+			DEST="${FHS[${INDEX,,}]}"
+			
+			#echo "DEST: $DEST // content: $@"
+			for tr in $@
+			do	case "$INDEX" in
+				SBINDIR|BINDIR|MAN[18]DIR)
+					if [ -d "${tr}" ]
+					then	for e in "./$tr/"*
+						do 	[ -d "$e" ] && \
+								echo "rm -fr $DEST/${e##*/}" || \
+								echo "rm -f $DEST/${e##*/}"
+						done
+					else	echo "rm -f $DEST/${tr##*/}"
+					fi
+					;;
+				COMPLDIR)
+					tr="${tr/\$\{APP\}/$APP}"
+					echo "rm -f $DEST/${tr##*/}"
+					;;
+			#	INFODIR)
+			#		echo $content
+			#		;;
+				*)	[ -d "$tr" ] && \
+						echo "rm -fr $DEST/${tr##*/}" || \
+						echo "rm -f $DEST/${tr##*/}"
+					;;
+				esac
+			done
+			return 0
+		}
+		write_distclean() { 
+		# Remove the files that where created
+		#
+			echo "(sleep 0.5 ; rm -f ./make-* ; rm -f $REFERENCE ) &"
+			#rm "./${script_name}.cfg"
+		}
+		
+		# Prepare script headers
+		for m in install uninstall distclean
+		do	echo "#!/bin/sh" > "make-$m"
+			[ ! "$m" = "distclean" ] && \
+				printf '%s\n' \
+					"[ \$UID -ne 0 ] && \\" \
+					"	echo \"This script requires root access.\" && \\" \
+					"	exit 99" \
+					"set -x" >> "make-$m"
+			chmod +x "make-$m"
+		done
+		$doRef && >"$REFERENCE"
+		
+		# Search for the available variables
+		for index in $variable_list
+		do	tmp=$(awk -F= -v VAR="$index" '$1 ~ "^[^#]*" VAR "$"{print $2}' "$SOURCE")
+			num=$(echo $tmp | wc -w)
+			if [ "$num" -gt 0 ]
+			then	# It has content
+				$doRef && write_reference "$index" >> "$REFERENCE"
+				case "$num" in
+				1)	write_install "$index" "$tmp" >> "make-install"
+					write_uninstall "$index" "$tmp" >> "make-uninstall"
+					;;
+				*)	for s in $(echo "$tmp"|sed s,\",,g)
+					do 	write_install "$index" "$s" >> "make-install"
+						write_uninstall "$index" "$s" >> "make-uninstall"
+					done
+					;;
+				esac
+			fi
+		done
+		
+		# Finalize
+		write_distclean >> "make-distclean"
+		if $doRef 
+		then	echo "mkdir -p ${FHS[sysconfdir]} ; cp $REFERENCE ${FHS[sysconfdir]}/$APP.conf" >> "make-install"
+			echo "rm -f ${FHS[sysconfdir]}/$APP.conf" >> "make-uninstall"
 		fi
-	}
-	double() { # INDEX
-	# Prints the index reference used
-	#
-		echo "${1}=${FHS[${1,,}]}"  | sed s,"//","/",g
+		for m in install uninstall
+		do	printf '%s\n' \
+				"RET=\$?" \
+				"set +x" >> "make-$m"
+		done
+		echo "echo \"Finished installation of $APP with exit code: \$RET (0=success)\"" >> "make-install"
 	}
 #
 #	Get options
@@ -117,6 +205,8 @@ There is NO WARRANTY, to the extent permitted by law.
 		--)		shift ; break	;;
 		esac
 	done
+	source "$SOURCE" ; [ -z "$APP" ] && exit 1
+	REFERENCE="${APP}_ref.conf"
 #
 #	Prepare paths
 #
@@ -148,37 +238,12 @@ There is NO WARRANTY, to the extent permitted by law.
 #
 #	Prepare installation script
 #
-	echo "#!/bin/sh" > "$OUTPUT"
-	echo "[ \$UID -ne 0 ] && echo \"This script requires root access.\" && exit 99" >> "$OUTPUT"
-	$doRef && >"$REFERENCE"
-	for index in $variable_list
-	do	tmp=$(awk -F= -v VAR="$index" '$1 ~ "^[^#]*" VAR "$"{print $2}' "$SOURCE")
-		num=$(echo $tmp | wc -w)
-		if [ "$num" -gt 0 ]
-		then	# It has content
-			case "$num" in
-			1)	echo "mkdir -p \"${FHS[${index,,}]}\"" >> "$OUTPUT"
-				single "$index" "$tmp" >> "$OUTPUT"
-				$doRef && double "$index" >> "$REFERENCE"
-				;;
-			*)	for s in $(echo "$tmp"|sed s,\",,g)
-				do 	echo "mkdir -p \"${FHS[${index,,}]}\"" >> "$OUTPUT"
-					single "$index" "$s" >> "$OUTPUT"
-				done
-				$doRef && double "$index" >> "$REFERENCE"
-				;;
-			esac
-		fi
-	done
-	$doRef && echo "cp $REFERENCE ${FHS[sysconfdir]}" >> "$OUTPUT"
-	# Finalize
-	echo "echo \"Finished installation of $APP with exit code: \$? (0=success)\"" >> "$OUTPUT"
-	chmod +x "$OUTPUT"
+	write_files
 #
 #	Output
 #
 	echo
-	echo "The installation script has been configured."
-	echo "To install \"$APP\" now, please execute: ./$OUTPUT"
+	echo "The installation script has been configured to ${FHS[prefix]}."
+	echo "To install \"$APP\" now, please execute: ./make-install"
 	echo
 	exit

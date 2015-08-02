@@ -29,8 +29,8 @@ generating a script named **make-install**
 
 What does it require?
 ---------------------
-* Shell (/bin/sh)
-* root access
+* Shell (/bin/bash and /bin/sh)
+* root access (for default prefix: /usr/local)
 
 As a 'general purpose slash-hammer solution' it expects to be for 'system-wide installations' 
 and therefor **make-install** requires root access.
@@ -73,4 +73,18 @@ To create a reference file, which contains the assigned paths:
 
 	doRef=true
 
-Which then will write the file **$APP\_ref.conf** which will be automaticly installed to **SYSCONFDIR (/etc)**.
+Which then will write the file **$APP\_ref.conf** which will be automaticly installed to **SYSCONFDIR (/etc/$APP.conf)**.
+
+
+Make-files
+----------
+
+After you did run something like:
+
+	./configure --prefix=/usr
+
+you will see, there are 3 new files in the path, all starting by **make-**.
+
+* make-distclean, removes the just created files
+* make-install, installs the project/package
+* make-uninstall, removes the installed project/package
