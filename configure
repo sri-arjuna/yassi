@@ -1,4 +1,6 @@
 #!/bin/bash
+#	Yet Another Simple Script Installer
+# ------------------------------------------------------------------------
 #
 #	Description:	Generates a simple 'make-install' script 
 #			a basic FHS conform installation
@@ -6,10 +8,13 @@
 #			This is not about auto magic compiling,
 #			this is about simply placing files.
 #
+#	To report bugs, please raise an issue on:
+#			https://github.com/sri-arjuna/yassi/issues
+#
 #	Created:	2015.07.27
 #	Changed:	2015.08.02
 	script_name=configure
-	script_version=0.4
+	script_version=0.5
 #
 # ------------------------------------------------------------------------
 #
@@ -38,12 +43,27 @@
 	unset FHS
 	SOURCE="$0.cfg"
 	declare -A FHS
-	index_list="prefix bindir sbindir sysconfdir datarootdir datadir docdir infodir man1dir man8dir compldir"
+	index_list="prefix bindir sbindir sysconfdir datarootdir datadir docdir infodir man1dir man8dir compldir sharedstatedir localstatedir"
 	variable_list="";for i in $index_list;do variable_list+=" ${i^^}";done
-	
+	source "$SOURCE"
 #
 #	Functions
 #
+	show_sample() {
+	# Prints a sample configure.cfg
+	#
+		cat <<-EOF
+			APP="projectname"
+			BINDIR="bin"
+			DOCDIR="docs/README.md docs/COPYING"
+			DATADIR="./templates ./themes"
+			MAN1DIR="docs/man"
+			BUGS="your@email.com"
+			ISSUE="https://github.com/sri-arjuna/yassi/issues"
+			doRef=true
+		EOF
+		exit 0
+	}
 	show_help() {
 	# Prints the helpscreen
 	# and exits
@@ -51,20 +71,28 @@
 Options:
 	-h|--help		Shows this screen and exits
 	--version		Shows the version and exits
+	--sample		Prints a sample configure.cfg required by projects
 	
 	--prefix DIR		Sets the prefix to DIR		(default: /usr/local)
-	--bindir DIR		Sets the bindir to DIR 		(\$PREFIX/bin)
-	--sbindir DIR		Sets the sbindir to DIR 	(\$PREFIX/sbin)
-	--sysconfdir DIR	Sets the sysconfdir to DIR 	(\$PREFIX/etc)
+	--bindir DIR		user executeables 		(\$PREFIX/bin)
+	--sbindir DIR		admin executeables		(\$PREFIX/sbin)
+	--sysconfdir DIR	read-only single-machine data 	(\$PREFIX/etc)
 	
-	--datarootdir DIR	Sets the datarootdir to DIR 	(\$PREFIX/share)
-	--datadir DIR		Sets the datadir to DIR 	(\$DATAROOTDIR/$APP)
-	--docdir DIR		Sets the docdir to DIR 		(\$DATAROOTDIR/doc/$APP)
+	--datarootdir DIR	read-only arch.-independent data root 	(\$PREFIX/share)
+	--datadir DIR		read-only architecture-independent data (\$DATAROOTDIR/$APP)
+	--docdir DIR		project documentation root	(\$DATAROOTDIR/doc/$APP)
 	
-	--infodir DIR		Sets the infodir to DIR 	(\$DATAROOTDIR/info)
-	--man1dir DIR		Sets the mandir to DIR 		(\$DATAROOTDIR/man/man1)
-	--man8dir DIR		Sets the mandir to DIR 		(\$DATAROOTDIR/man/man8)
-	--compldir DIR		Sets the (bash)compldir to DIR 	(\$DATAROOTDIR/bash-completion/completions)
+	--infodir DIR		info documentation		(\$DATAROOTDIR/info)
+	--man1dir DIR		man 1 documentation 		(\$DATAROOTDIR/man/man1)
+	--man8dir DIR		man 8 documentation 		(\$DATAROOTDIR/man/man8)
+	--compldir DIR		bash completion			(\$DATAROOTDIR/bash-completion/completions)
+	
+	--sharedstatedir	modifiable architecture-independent	(\$PREFIX/com)
+	--localstatedir		modifiable single-machine data	(\$PREFIX/var)
+	--localedir		locale-dependent data		(\$DATAROOTDIR/locale)
+			
+	$( [ ! -z "$BUGS" ] && echo "Report bugs of \"$APP\" to \"$BUGS\"")
+	$( [ ! -z "$ISSUE" ] && echo "Report bugs of \"$APP\" on \"$ISSUE\"")
 	"
 		echo "$MSG_TR_HELP"
 		exit 99
@@ -120,7 +148,6 @@ There is NO WARRANTY, to the extent permitted by law.
 					fi
 					;;
 				COMPLDIR)
-					echo " --- $tr --- " >&2
 					tr="${tr/\$\{APP\}/$APP}"
 					echo "rm -f $DEST/${tr##*/}"
 					;;
@@ -194,7 +221,7 @@ There is NO WARRANTY, to the extent permitted by law.
 	# -a|--alternative ; to allow longoptions with a single leading '-'
 	GETOPT=$(getopt \
 		--options	"h" \
-		--longoptions	"help,version,bindir:,sbindir:,prefix:,datarootdir:,bindir:,bindir:,bindir:,bindir:,bindir:,bindir:" \
+		--longoptions	"help,version,sample,bindir:,sbindir:,prefix:,datarootdir:,datadir:,infodir:,man1dir:,man8dir:,localedir:,docdir:,compldir:,sharedstatedir:,localstatedir:,localedir:" \
 		--name 		"${0##*/}" -- "${@}"
 	)
 	eval set -- "$GETOPT"
@@ -202,14 +229,16 @@ There is NO WARRANTY, to the extent permitted by law.
 	do 	case "$1" in
 		-h|--help)	show_help	;;
 		--version)	show_version	;;
-		--prefix|--bindir|--sbindir|--datarootdir|\
-		--datadir|--infodir|--sysconfdir|--man1dir|--man8dir|--docdir|--compldir)
+		--sample)	show_sample	;;
+		--prefix|--bindir|--sbindir|--datarootdir|--datadir|\
+		--infodir|--sysconfdir|--man1dir|--man8dir|--docdir|\
+		--compldir|--sharedstatedir|--localstatedir|--localedir)
 				FHS["${1/--}"]="$2"
 				shift 2		;;
 		--)		shift ; break	;;
 		esac
 	done
-	source "$SOURCE" ; [ -z "$APP" ] && exit 1
+	[ -z "$APP" ] && exit 1
 	REFERENCE="${APP}_ref.conf"
 #
 #	Prepare paths
@@ -232,11 +261,14 @@ There is NO WARRANTY, to the extent permitted by law.
 			infodir)	tmp="${FHS[datarootdir]}/info"	;;
 			man1dir)	tmp="${FHS[datarootdir]}/man/man1" ;;
 			man8dir)	tmp="${FHS[datarootdir]}/man/man8" ;;
+			localedir)	tmp="${FHS[datarootdir]}/locale" ;;
 			docdir)		tmp="${FHS[datarootdir]}/doc/$APP" ;;
-			compldir)	tmp="${FHS[datarootdir]}/bash-completion/completions"
+			compldir)	tmp="${FHS[datarootdir]}/bash-completion/completions"	;;
+			sharedstatedir)	tmp="${FHS[prefix]}/com"	;;
+			localstatedir)	tmp="${FHS[prefix]}/var"	;;
 			esac
+			FHS["$index"]="$tmp"
 		fi
-		FHS["$index"]="$tmp"
 	done
 #
 #	Prepare installation script
