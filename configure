@@ -6,7 +6,7 @@
 #	Created:	2015.07.27
 #	Changed:	2015.08.02
 	script_name=./configure
-	script_version=0.3
+	script_version=0.4
 #
 # ------------------------------------------------------------------------
 #
@@ -117,6 +117,7 @@ There is NO WARRANTY, to the extent permitted by law.
 					fi
 					;;
 				COMPLDIR)
+					echo " --- $tr --- " >&2
 					tr="${tr/\$\{APP\}/$APP}"
 					echo "rm -f $DEST/${tr##*/}"
 					;;
@@ -226,7 +227,6 @@ There is NO WARRANTY, to the extent permitted by law.
 			datarootdir)	tmp="${FHS[prefix]}/share"	;;
 			datadir)	tmp="${FHS[datarootdir]}/$APP"	;;
 			infodir)	tmp="${FHS[datarootdir]}/info"	;;
-			compldir)	tmp="${FHS[datarootdir]}/compl"	;;
 			man1dir)	tmp="${FHS[datarootdir]}/man/man1" ;;
 			man8dir)	tmp="${FHS[datarootdir]}/man/man8" ;;
 			docdir)		tmp="${FHS[datarootdir]}/doc/$APP" ;;
