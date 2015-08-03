@@ -12,9 +12,9 @@
 #			https://github.com/sri-arjuna/yassi/issues
 #
 #	Created:	2015.07.27
-#	Changed:	2015.08.02
+#	Changed:	2015.08.03
 	script_name=configure
-	script_version=0.5
+	script_version=0.6
 #
 # ------------------------------------------------------------------------
 #
@@ -54,10 +54,10 @@
 	#
 		cat <<-EOF
 			APP="projectname"
-			BINDIR="bin"
+			BINDIR=bin
 			DOCDIR="docs/README.md docs/COPYING"
 			DATADIR="./templates ./themes"
-			MAN1DIR="docs/man"
+			MAN1DIR=docs/man
 			BUGS="your@email.com"
 			ISSUE="https://github.com/sri-arjuna/yassi/issues"
 			doRef=true
@@ -79,8 +79,8 @@ Options:
 	--sysconfdir DIR	read-only single-machine data 	(\$PREFIX/etc)
 	
 	--datarootdir DIR	read-only arch.-independent data root 	(\$PREFIX/share)
-	--datadir DIR		read-only architecture-independent data (\$DATAROOTDIR/$APP)
-	--docdir DIR		project documentation root	(\$DATAROOTDIR/doc/$APP)
+	--datadir DIR		read-only architecture-independent data (\$DATAROOTDIR/${APP:-APPNAME})
+	--docdir DIR		project documentation root	(\$DATAROOTDIR/doc/${APP:-APPNAME})
 	
 	--infodir DIR		info documentation		(\$DATAROOTDIR/info)
 	--man1dir DIR		man 1 documentation 		(\$DATAROOTDIR/man/man1)
@@ -119,8 +119,7 @@ There is NO WARRANTY, to the extent permitted by law.
 			echo "mkdir -p \"${FHS[${1,,}]}\""
 			if [ -d "$2" ] && [ ! "./" = "${2:0:2}" ]
 			then	echo "cp -ar \"$2/\"* \"${FHS[${1,,}]}\"" | sed s,"//","/",g
-			elif [ -e  "$2" ]
-			then	echo "cp -ar \"$2\" \"${FHS[${1,,}]}\"" | sed s,"//","/",g
+			else	echo "cp -ar \"$2\" \"${FHS[${1,,}]}\"" | sed s,"//","/",g
 			fi
 		}
 		write_reference() { # INDEX
@@ -180,7 +179,7 @@ There is NO WARRANTY, to the extent permitted by law.
 					"set -x" >> "make-$m"
 			chmod +x "make-$m"
 		done
-		$doRef && >"$REFERENCE"
+		>"$REFERENCE"
 		
 		# Search for the available variables
 		for index in $variable_list
@@ -188,14 +187,16 @@ There is NO WARRANTY, to the extent permitted by law.
 			num=$(echo $tmp | wc -w)
 			if [ "$num" -gt 0 ]
 			then	# It has content
-				$doRef && write_reference "$index" >> "$REFERENCE"
+				write_reference "$index" >> "$REFERENCE"
 				case "$num" in
 				1)	write_install "$index" "$tmp" >> "make-install"
 					write_uninstall "$index" "$tmp" >> "make-uninstall"
+					#write_reference "$index" >> "$REFERENCE"
 					;;
 				*)	for s in $(echo "$tmp"|sed s,\",,g)
 					do 	write_install "$index" "$s" >> "make-install"
 						write_uninstall "$index" "$s" >> "make-uninstall"
+						#write_reference "$index" >> "$REFERENCE"
 					done
 					;;
 				esac
