@@ -113,5 +113,6 @@ you will see, there are 3 new files in the path, all starting by **make-**.
 Other:
 ------
 
-[Youtube howto](http://youtu.be/6JUPkuCY1UE), from empty to project to install and uninstall in ~10minutes
+[Youtube howto](http://youtu.be/6JUPkuCY1UE), from empty to project to install and uninstall in ~10minutes.
+
 If you like YASSI, you might like [TUI](https://github.com/sri-arjuna/tui) as well.
