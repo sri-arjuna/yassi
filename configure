@@ -3,9 +3,12 @@
 #	Description:	Generates a simple 'make-install' script 
 #			a basic FHS conform installation
 #
+#			This is not about auto magic compiling,
+#			this is about simply placing files.
+#
 #	Created:	2015.07.27
 #	Changed:	2015.08.02
-	script_name=./configure
+	script_name=configure
 	script_version=0.4
 #
 # ------------------------------------------------------------------------
@@ -70,7 +73,7 @@ Options:
 	# Prints the version of the script
 	# and exits
 		MSG_TR_VERSION="(sea) $script_name, Version $script_version
-Copyright (C) $(date +'%Y') Simon Arjuna, Erat
+Copyright (C) $(date +'%Y') Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
