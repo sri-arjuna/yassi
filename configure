@@ -247,6 +247,6 @@ There is NO WARRANTY, to the extent permitted by law.
 #
 	echo
 	echo "The installation script has been configured to ${FHS[prefix]}."
-	echo "To install \"$APP\" now, please execute: ./make-install"
+	echo "To install \"$APP\" now, please execute: su -c \"./make-install\""
 	echo
 	exit
