@@ -79,6 +79,16 @@ To create a reference file, which contains the assigned paths:
 Which then will write the file **$APP\_ref.conf** which will be automaticly installed to **SYSCONFDIR (/etc/$APP.conf)**.
 
 
+There are situations were a you cannot have it done all in one.
+
+So you may add custom tasks, either by additional scripts or commands you place in the **configure.cfg**.
+
+	POST[0]=post_script1.sh
+	POST[1]="echo \"Thank you for choosing '\$APP'!\""
+
+This would generate 2 lines in **make-install**, if **post\_script1.sh** is found it would be called by **sh**, 
+and the tailing message to the user, thanking him to choose your project.
+
 
 Syntax:
 -------

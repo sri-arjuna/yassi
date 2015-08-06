@@ -8,13 +8,13 @@
 #			This is not about auto magic compiling,
 #			this is about simply placing files.
 #
-#	To report bugs, please raise an issue on:
+#	To report bugs or suggestions, please raise an issue on:
 #			https://github.com/sri-arjuna/yassi/issues
 #
 #	Created:	2015.07.27
-#	Changed:	2015.08.03
+#	Changed:	2015.08.05
 	script_name=configure
-	script_version=0.6
+	script_version=0.7
 #
 # ------------------------------------------------------------------------
 #
@@ -38,36 +38,57 @@
 #
 #	Internal Variables
 #
+	unset FHS POST
+	declare -A FHS
+	declare -a POST
+	
 	APP=""
 	doRef=false
-	unset FHS
 	SOURCE="$0.cfg"
-	declare -A FHS
+	
 	index_list="prefix bindir sbindir sysconfdir datarootdir datadir docdir infodir man1dir man8dir compldir sharedstatedir localstatedir"
-	variable_list="";for i in $index_list;do variable_list+=" ${i^^}";done
+	variable_list="";for i in $index_list;do variable_list+=" ${i^^}";done;variable_list+=" POST"
 	source "$SOURCE"
 #
 #	Functions
 #
 	show_sample() {
 	# Prints a sample configure.cfg
-	#
+	# and exits
 		cat <<-EOF
+			# Project name
+			# Used for /usr/share/\$APP & /usr/share/doc/\$APP
 			APP="projectname"
+			
+			# Directories
+			# A plain dirname will copy all its content
+			# Single entries must not be quoted!
 			BINDIR=bin
+			# A plain filename will copy just the file
+			# Multiple entries shall be quoted.
 			DOCDIR="docs/README.md docs/COPYING"
+			# A dirname with a leading ./ will copy the directory
 			DATADIR="./templates ./themes"
 			MAN1DIR=docs/man
+			
+			# Specials
+			# Set true to keep the reference file in /etc/\$APP.conf
+			doRef=false
+			# Place scripts or commands in the array
+			# variables from the \$APP_ref.conf will be available within scripts called here.
+			POST[0]=post_script1.sh
+			POST[1]="echo \"Thank you for choosing '\$APP'!\""
+			
+			# Contact
 			BUGS="your@email.com"
 			ISSUE="https://github.com/sri-arjuna/yassi/issues"
-			doRef=true
 		EOF
 		exit 0
 	}
 	show_help() {
 	# Prints the helpscreen
 	# and exits
-		MSG_TR_HELP="Usage:	$script_name [options]
+		MSG_TR_HELP="Usage:	./$script_name [options]
 Options:
 	-h|--help		Shows this screen and exits
 	--version		Shows the version and exits
@@ -202,6 +223,18 @@ There is NO WARRANTY, to the extent permitted by law.
 				esac
 			fi
 		done
+		
+		# Check for post operations
+		if [ ! -z "$(echo ${POST[@]})" ]
+		then 	C=0
+			while 	item="${POST[$C]}"
+				[ ! -z "$item" ]
+			do 	[ -f "$item" ] && \
+					echo "sh ./$item" >> "make-install" || \
+					echo "$item" >> "make-install"
+				((C++))
+			done
+		fi
 		
 		# Finalize
 		write_distclean >> "make-distclean"
