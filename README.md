@@ -21,7 +21,7 @@ or contain just plain text files or only multimedia binaries.
 
 
 
-Why is the file not named 'yaasi'?
+Why is the file not named 'yassi'?
 ----------------------------------
 
 As people like to meet what they already know or expect, i named it **configure** instead, 

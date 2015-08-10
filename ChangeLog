@@ -4,4 +4,4 @@
 * Added PRIOR, POST and REMOVE task-array support
 * Providing now '--samples', '--samples-full' & '--tarball'
 * Added some optional variables: APP_VER, APP_DIR
-* Updated README
+* Updated [README](https://github.com/sri-arjuna/yassi/blob/master/README.md)
