@@ -1,0 +1,7 @@
+2015.08.10 - Simon Arjuna Erat - erat.simon@gmail.com - 0.8
+* Fixed sbin/bin dir installation issue
+* Added mandir support - missed 2-7 + 9
+* Added PRIOR, POST and REMOVE task-array support
+* Providing now '--samples', '--samples-full' & '--tarball'
+* Added some optional variables: APP_VER, APP_DIR
+* Updated README
