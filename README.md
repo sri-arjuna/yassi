@@ -25,81 +25,114 @@ Why is the file not named 'yaasi'?
 ----------------------------------
 
 As people like to meet what they already know or expect, i named it **configure** instead, 
-generating a script named **make-install**
+generating a script named **make-install** to go conform with the great and powerfull standard '[GNU Autoconf](http://www.gnu.org/software/autoconf/autoconf.html)'.
 
 
 
 What does it require?
 ---------------------
 * Shell (/bin/bash and /bin/sh)
+* awk, grep, sed
 * root access (for default prefix: /usr/local)
+* you to create a configure.cfg
 
 As a 'general purpose slash-hammer solution' it expects to be for 'system-wide installations' 
 and therefor **make-install** requires root access.
 
 
 
-Config configure
+Configure Syntax
 ----------------
 
-Make a file called **configure.cfg** with this example content, and place it along with **configure** in your **project root dir**.
+See the latest samples by:
 
-	APP=project-name
-	BINDIR=bin
-	DOCDIR=README.md
-	DATADIR="./templates ./samples"
+	./configure --sample
+	./configure --sample-full
+
+There are 3 **APP** variables:
+
+* APP, which provides the application name for the DATADIR
+* APP\_VER, which provides the current version, use (not required) by the **--tarball** option.
+* APP\_DIR, change the default (without arguments/options) dir
+
+Each of the _--\*dir_-options provides its name in as variable in CAPS.
+
+So, if you want to place your files in what would be _--bindir=_, simply use _BINDIR=_ within the **configure.cfg**
+
+Please see **--help** output, to figure your target variable.
+
+There are 4 different types of assignments:
+
+* Everything of a directory (**=docs**)
+* Single files (**=data/file5.dat**)
+* Single directories (**=./somedir**)
+* Multiple entries (**="extra/file1.txt ./somedir**)
+
+You even may pass an astrerix to 'limit' the files.
+
+Example:
+
+	MAN1DIR=mans/*.1
+	MAN8DIR=mans/*.8
+
+Please be aware to not quote any single entry.
+
+Only quote assignments with multiple items. (asterix (\*) is a single entry and 'must not'! be quoted)
+
+
+
+$APP\_dirs.conf:
+----------------
+
+To create the **'make-\*'** scripts, a this file is used to save the generated paths.
+
+If your projects provides more than just docs and scripts, this is very much the case, 
+then you might want to use:
+
 	doRef=true
 
-
-First line **APP=project-name** is required to get the proper naming for the path structures, such as **/usr/share/$APP**.
-
-The following **BINDIR,DOCDIR,DATADIR** show all the features available as of now.
-(*To define what files or folders shall me installed somewhere, simply write its option-name in capitals,
-followed by either a file or folder name.*)
-
-Install a file:
-
-	DOCDIR=README.md
-
-One may pass multiple entries, in fact, passing a folder name will 'expand' to its content.
-
-Install all files of a folder:
-
-	BINDIR=bin	
-
-Install multiple folders (these will actualy copy the folder, not just its content):
-
-	DATADIR="./templates ./samples"
+As this will save that 'path configuration' used for the project to /etc/$APP.conf, 
+so you can refer from your scripts to that file, to know where all the other files are installed.
 
 
-To create a reference file, which contains the assigned paths:
 
-	doRef=true
+Specials:
+---------
 
-Which then will write the file **$APP\_ref.conf** which will be automaticly installed to **SYSCONFDIR (/etc/$APP.conf)**.
+To customize the experience for your users, and after you made sure the (un-)installation script works,
+you might want to add your contact info, or a place where people could report bugs about your software.
 
+Simply add:
 
-There are situations were a you cannot have it done all in one.
-
-So you may add custom tasks, either by additional scripts or commands you place in the **configure.cfg**.
-
-	POST[0]=post_script1.sh
-	POST[1]="echo \"Thank you for choosing '\$APP'!\""
-
-This would generate 2 lines in **make-install**, if **post\_script1.sh** is found it would be called by **sh**, 
-and the tailing message to the user, thanking him to choose your project.
+* BUGS=\* ; Will provide a text to send an email to.
+* ISSUE=http://\* ; to provide an URL users can visit to report bugs.
 
 
-Syntax:
--------
+Very often one might need to prepare some files or change them after installation.
 
-Assinging files and paths to \*DIR variables follows simple rules.
+If you have such task, consider yourself skilled enough to handle this. ;)
 
-* If there is just one entry - no quotes
-* If there are multiple entries - quotes!
-* Every path is expanded to its content, unless it starts with **./**
+To complete such tasks, **YASSI** provides the use of 3 different arrays:
 
-If you need want some real uses of my own **configure.cfg**'s:
+* PRIOR, things done after writing the REFERENCE file
+* POST, things done after installation
+* REMOVE, things done during uninstall.
+
+As these are arrays, you will have to assign the values according to BASH syntax, and follow proper escape sequences.
+
+You might want to know that for all the 3 arrays, the variables provided by the **REFERENCE** file shoould be available/usable.
+
+Example:
+
+* PRIOR[0]="echo \"Hello \$USER, you're installing $APP to $BINDIR.\""
+
+
+Example configurations:
+
+* [yassi-example](https://github.com/sri-arjuna/yassi-example)
+
+
+And my other projects using this:
 
 * [connect](https://github.com/sri-arjuna/connect)
 * [dev-scripts](https://github.com/sri-arjuna/dev-scripts)
@@ -126,3 +159,9 @@ Other:
 [Youtube howto](https://youtu.be/KhuariqAL2k), from empty to project to install and uninstall in ~10minutes.
 
 If you like YASSI, you might like [TUI](https://github.com/sri-arjuna/tui) as well.
+
+
+Bugs:
+-----
+
+If you should experience a bug or other issues, please raise an issue on: [https://github.com/sri-arjuna/yassi/issues](https://github.com/sri-arjuna/yassi/issues).
