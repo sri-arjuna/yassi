@@ -5,3 +5,4 @@
 * Providing now '--samples', '--samples-full' & '--tarball'
 * Added some optional variables: APP_VER, APP_DIR
 * Updated [README](https://github.com/sri-arjuna/yassi/blob/master/README.md)
+* Added preview screenshot
