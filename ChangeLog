@@ -6,3 +6,8 @@
 * Added some optional variables: APP_VER, APP_DIR
 * Updated [README](https://github.com/sri-arjuna/yassi/blob/master/README.md)
 * Added preview screenshot
+
+2015.08.16 - Simon Arjuna Erat - erat.simon@gmail.com - 0.9
+* Removed automatic appending of '|| exit 1' for 'PRIOR','POST' and 'REMOVE' tasks
+* Added 'prefix=<prefix>' to $APP_dirs.conf file
+* --tarball now runs --prefix=<prefix> and executes prior tasks
