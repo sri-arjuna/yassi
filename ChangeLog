@@ -11,3 +11,7 @@
 * Removed automatic appending of '|| exit 1' for 'PRIOR','POST' and 'REMOVE' tasks
 * Added 'prefix=<prefix>' to $APP_dirs.conf file
 * --tarball now runs --prefix=<prefix> and executes prior tasks
+
+2015.08.16 - Simon Arjuna Erat - erat.simon@gmail.com - 0.9.1
+* APP_REQUIRES may now contain all commands required by your script project
+* Remember custom dependencies may be placed in PRIOR tasks
