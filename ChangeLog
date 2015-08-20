@@ -15,3 +15,6 @@
 2015.08.16 - Simon Arjuna Erat - erat.simon@gmail.com - 0.9.1
 * APP_REQUIRES may now contain all commands required by your script project
 * Remember custom dependencies may be placed in PRIOR tasks
+
+2015.08.16 - Simon Arjuna Erat - erat.simon@gmail.com - 0.9.2
+* Handle --prefix={~,$HOME} different from --prefix={/,/usr,/usr/local}

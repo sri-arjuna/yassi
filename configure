@@ -2,22 +2,21 @@
 #	Yet Another Simple Script Installer
 # ------------------------------------------------------------------------
 #
-#	Description:	Generates a simple 'make-install' script 
-#			a basic FHS conform installation
-#
-#			This is not about auto magic compiling,
-#			this is about simply placing files.
-#
+#	Description:
+#	Generates a simple 'make-install' and 'make-uninstall'script for a basic FHS conform installation
 #	Path Reference:	http://www.pathname.com/fhs/
 #
+#		This is not about auto magic compiling,
+#		this is about simply placing files.
 #
-#	To report bugs or suggestions, please raise an issue on:
-#			https://github.com/sri-arjuna/yassi/issues
+#
+#	To report bugs or suggestions about this script, please raise an issue on:
+#		https://github.com/sri-arjuna/yassi/issues
 #
 #	Created:	2015.07.27
-#	Changed:	2015.08.16
+#	Changed:	2015.08.20
 	script_name=configure
-	script_version=0.9.1
+	script_version=0.9.2
 #
 # ------------------------------------------------------------------------
 #
@@ -50,6 +49,7 @@
 	APP=""
 	doRef=false
 	doTarball=false
+	is_at_home=false
 	SOURCE="$0.cfg"
 	
 	mandirs="$(echo man{1..9}dir)"
@@ -251,15 +251,18 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		# Prepare script headers
 		for m in install uninstall distclean
 		do	echo "#!/bin/sh" > "make-$m"
-			[ ! "$m" = "distclean" ] && \
-				printf '%s\n' \
+			if $is_at_home && [ ! "$m" = "distclean" ]
+			then	printf '%s\n' \
 					"[ -z \$UID ] && UID=0" \
 					"[ \$UID -ne 0 ] && \\" \
 					"	echo \"This script requires root access.\" && \\" \
-					"	exit 99" \
-					"set -x" >> "make-$m"
+					"	exit 99"  >> "make-$m"
+			elif [ ! "$m" = "distclean" ]
+			then	echo "set -x" >> "make-$m"
+			fi
 			chmod +x "make-$m"
 		done
+		$is_at_home && ${FHS[prefix]}="$prefix_home"
 		echo "prefix=${FHS[prefix]}">"$REFERENCE"
 		
 		# Write content of PRIOR tasks, if any
@@ -299,7 +302,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				esac
 			fi
 		done
-		source "$REFERENCE"
+		source "$PWD/$REFERENCE"
 		
 		# Check for removal operations
 		if [ ! -z "$(echo ${REMOVE[@]})" ]
@@ -335,7 +338,6 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				((C++))
 			done
 		fi
-		
 		for m in install uninstall
 		do	echo >> "make-$m"
 			printf '%s\n' \
@@ -344,6 +346,10 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		done
 		
 		echo "echo;echo \"Finished installation of $APP\";exit \$RET" >> "make-install"	# with exit code: \$RET (0=success)\""
+		#sed s,'set -x','',g -i make-{uni,i}nstall
+		
+		sed s,'set -x',"set -x\nSYSCONFDIR=$SYSCONFDIR",g -i make-{uni,i}nstall
+		sed s,'~',"$HOME",g -i make-{uni,i}nstall
 	}
 #
 #	Get options
@@ -378,16 +384,22 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 	for index in $index_list
 	do
 		tmp="${FHS[$index]}"
+		etc_done=false
 		if [ -z "$tmp" ]
 		then	case "$index" in
 			prefix)		tmp="${APP_DIR:-/usr/local}"	;;
 			"bindir")	tmp="${FHS[prefix]}/bin"	;;
 			"sbindir")	tmp="${FHS[prefix]}/sbin"	;;
-			sysconfdir)	case "${FHS[prefix]}" in
+			sysconfdir)	tmp_prefix="${FHS[prefix]}"
+					case "$tmp_prefix" in
 					"/"|"/usr")
 						tmp="/etc"		;;
-					*)	tmp="${FHS[prefix]}/etc";;
-					esac				;;
+					*)	if $is_at_home
+						then	tmp="$HOME/.local/etc"
+						else	tmp="${FHS[prefix]}/etc"
+						fi
+						;;
+					esac ; etc_done=true				;;
 			datarootdir)	tmp="${FHS[prefix]}/share"	;;
 			datadir)	tmp="${FHS[datarootdir]}/$APP"	;;
 			infodir)	tmp="${FHS[datarootdir]}/info"	;;
@@ -399,6 +411,15 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			sharedstatedir)	tmp="${FHS[prefix]}/com"	;;
 			localstatedir)	tmp="${FHS[prefix]}/var"	;;
 			esac
+			if [ "$index" = "prefix" ] && ! $etc_done
+			then	# Do special handling
+					[ "~" = "${tmp:0:1}" && tmp="${tmp/~/$HOME}"
+					if [ "${tmp:0:${#HOME}}" = "$HOME" ] #|| [ "$tmp" ~= ^"~" ]
+					then	is_at_home=true
+						prefix_home="${{tmp/~/$HOME}/$HOME}"
+						tmp="$prefix_home"
+					fi
+			fi
 			FHS["$index"]="$tmp"
 		fi
 	done
@@ -434,7 +455,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			echo "Successfully created tarball ${tarball}!"
 	else	echo
 		echo "The installation script has been configured to ${FHS[prefix]}."
-		echo "To install \"$APP\" now, please execute: 'su -c \"./make-install\"'"
+		echo "To install \"$APP\" now, please execute: 'sudo ./make-install'"
 		echo
 	fi
 	exit

@@ -27,6 +27,8 @@ Why is the file not named 'yassi'?
 As people like to meet what they already know or expect, i named it **configure** instead, 
 generating a script named **make-install** to go conform with the great and powerfull standard '[GNU Autoconf](http://www.gnu.org/software/autoconf/autoconf.html)'.
 
+Please, do use '[GNU Autoconf](http://www.gnu.org/software/autoconf/autoconf.html)' if you must compile your project!
+
 
 
 What does it require?
@@ -36,8 +38,9 @@ What does it require?
 * root access (for default prefix: /usr/local)
 * you to create a configure.cfg
 
-As a 'general purpose slash-hammer solution' it expects to be for 'system-wide installations' 
-and therefor **make-install** requires root access.
+You may choose ~/.local or $HOME/local as prefix, 
+and YASSI (configure) will then create the **make-install** and **make-uninstall** script not require root access for installation.
+So, as you see, even for personal installations, this is highly convenient.
 
 
 
