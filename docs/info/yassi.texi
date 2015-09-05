@@ -1,0 +1,183 @@
+\input texinfo   @c -*-texinfo-*-
+@comment %**start of header
+@setfilename YASSI.info
+@include _version.texi
+@settitle Manual 1.0 for Yet Another Simple Script Installation (YASSI)
+@syncodeindex pg cp
+@comment %**end of header
+@copying
+This manual is for YASSI (version @value{VERSION}, @value{UPDATED})
+Copyright @copyright{} 2015 Simon Arjuna Erat
+YASSI is licensed as GPLv3.
+The manual is licensed as GFDL.
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+@end quotation
+@end copying
+
+@documentdescription
+gnu,linux,script,bash,ash,csh,zsh,YASSI,cli
+@end documentdescription
+
+@comment ## --------------------------------------------------------------- ##
+
+@titlepage
+@title Table of Content
+@subtitle for version @value{VERSION}, @value{UPDATED}
+@author Simon Arjuna Erat (@email{erat.simon@@gmail.com})
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+
+@comment ## --------------------------------------------------------------- ##
+
+@ifnottex
+@node Top
+@top YASSI
+This manual is for YASSI (version @value{VERSION}, @value{UPDATED}).
+@end ifnottex
+
+
+@menu
+* Introduction to YASSI :: 
+* Installation :: Optimal installation & de-installation
+* Configure Syntax :: What, Where, When
+* Examples :: Some basic examples
+@end menu
+@contents
+
+@comment ## --------------------------------------------------------------- ##
+
+@node Introduction to YASSI
+@chapter Introduction to YASSI
+
+Yet Another Simple Script Installer (YASSI) is designed to create required scripts
+according to a single configuration file.
+
+Once the file 'configure' is placed within your project directory and the file 'configure.cfg' was created too,
+it will generate these commands:
+@table @code
+@bullet{} make-install
+@*
+@bullet{} make-uninstall
+@*
+@bullet{} make-distclean
+@end table
+
+@b{HINT:} Install YASSI to your system to use installed 'configure' rather than the 'configure' provided by the project.
+However, be sure that there is a @b {configure.cfg} otherwise it is very likely to be a GNU Autotools installation
+
+
+
+@comment ## --------------------------------------------------------------- ##
+
+
+@node Installation
+@chapter Installation
+@section Getting the code
+It is recommended by FHS (http://www.pathname.com/fhs/pub/fhs-2.3.html#USRSRCSOURCECODE) to save source code in /usr/src.
+@example
+    su
+    cd /usr/src
+    git clone https://github.com/sri-arjuna/yassi.git
+    ls yassi
+@end example
+
+@section A basic installation procedure looks like:
+@example
+    cd $PROJECTDIR
+    cp /usr/src/yassi/configure .
+    ./configure --sample > configure.cfg
+    $EDITOR configure.cfg
+@end example
+
+By default this will install YASSI using the default prefix /usr/local, so the binaries will be available in PREFIX/bin.
+
+@section Update
+Recieving update is very easy when using git...
+@example
+	su
+	cd /usr/src/yassi
+	git pull
+	tail ChangeLog
+	cd $PROJECTDIR
+	cp /usr/src/yassi/configure .
+@end example
+
+@section Uninstall
+@example
+    su
+    cd /usr/src
+    rm -fr yassi
+@end example
+
+
+@comment ## --------------------------------------------------------------- ##
+
+
+@node Configure Syntax
+@chapter Configure Syntax
+To configure your project for the YASSI configure, the most simple method would be:
+@example
+    configure --sample > configure.cfg
+@end example
+There is also a more detailed sample available:
+@example
+    configure --sample-full > configure.cfg
+@end example
+
+
+@section Application settings
+The most important part is @b {APP} which will contain the project name used for path installation.
+While YASSI by itself provides a default installation prefix of @sc {/usr/local}, using @sc {APP_DIR=$HOME/.local} you could easily overwrite that default.
+Also very nice @sc {APP_VER}, wich would be part of the create project tarball:
+@example
+	./configure --prefix=/usr --tarball
+	ls ..
+@end example
+
+@section Directories
+Each of the options ending with the letters @sc {dir} may be used in CAPITALS to assign @sc {items}.
+This may look like:
+@example
+    BINDIR=myscript.sh
+@end example
+
+Maybe you have 2 kinds of commands:
+
+@example
+    BINDIR=my_script.sh
+    SBINDIR=my_root_script.sh
+    
+    MAN1DIR=docs/mans/*.1
+    MAN8DIR=docs/mans/*.8
+@end example
+
+One can also pass multiple entries to a target:
+@example
+    DOCDIR="README.md docs/[A-Z]*"
+@end example
+
+
+
+
+@section PRIOR
+
+
+@comment ## --------------------------------------------------------------- ##
+
+
+@node Examples
+@chapter Examples
+This is a summary description of each command, grouped into different categories.
+
+
+@bye
