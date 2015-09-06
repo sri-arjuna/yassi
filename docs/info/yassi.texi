@@ -65,11 +65,12 @@ according to a single configuration file.
 Once the file 'configure' is placed within your project directory and the file 'configure.cfg' was created too,
 it will generate these commands:
 @table @code
+@item
 @bullet{} make-install
-@*
+@item
 @bullet{} make-uninstall
-@*
-@bullet{} make-distclean
+@item
+@bullet{}  make-distclean
 @end table
 
 @b{HINT:} Install YASSI to your system to use installed 'configure' rather than the 'configure' provided by the project.
@@ -168,8 +169,30 @@ One can also pass multiple entries to a target:
 
 
 
+@section Tweaking / Additional Tasks
 
-@section PRIOR
+There are 3 arrays you can assign scripts or commands to:
+
+@table @code
+@item 
+@bullet{} PRIOR
+@item 
+@bullet{} POST
+@item 
+@bullet{} REMOVE
+@end table
+
+
+If an entry to the PRIOR array is a file, it will be called by sh.
+Otherwise the entry is expected to be a command, and will be executed as such.
+
+Obviously, PRIOR items will be executed before the installation, 
+POST after the installation, and REMOVE when unstinstalling.
+
+See the output of:
+@example
+    ./configure --sample-full
+@end example
 
 
 @comment ## --------------------------------------------------------------- ##
