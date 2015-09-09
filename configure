@@ -66,6 +66,7 @@
 	declare -a POST		# This will be ran last during ./make-install
 	declare -a REMOVE	# This will be ran during ./make-uninstall
 	declare -a CLEAN	# This will be ran during ./make-distclean
+	declare -a IGNORE	# These files will be ignored when running './configure --tarball --prefix=/usr'
 	AWK=\awk
 	GREP=\grep
 	SED=\sed
@@ -156,9 +157,8 @@
 		#
 		#	Clean up what has been prepared 
 		#
-		 	CLEAN[0]="docs/info/\$APP.{info,html}"
-		 	#CLEAN[0]="docs/info/\$APP.html"
-		 	CLEAN[1]="rm docs/info/\$APP.html docs/info/\$APP.info"
+		 	CLEAN[0]="docs/info/\$APP.html"
+		 	CLEAN[0]="docs/info/\$APP.info"
 		#
 		#	Additional tasks for the uninstallation process
 		#
@@ -305,7 +305,11 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		write_distclean() { 
 		# Remove the files that where created
 		#
-			echo "(sleep 0.03 ; rm -f \"$REFERENCE\" ; rm -f ./make-* ; echo ) &"
+			cat <<-EOF
+			
+			rm -f "$REFERENCE"
+			rm -f ./make-* 
+			EOF
 		}
 		
 		# Prepare script headers
@@ -389,7 +393,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				[ ! -z "$item" ]
 			do 	[ -f "$item" ] && \
 					echo "rm -f $item" >> "make-uninstall" || \
-					echo "$item" >> "make-uninstall" #  || exit 1
+					echo "$item" >> "make-uninstall"
 				((C++))
 			done
 		fi
@@ -402,13 +406,12 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			while 	item="${CLEAN[$C]}"
 				[ ! -z "$item" ]
 			do 	[ -f "$item" ] && \
-					echo "rm ./$item" >> "make-distclean" || \
+					echo "rm $item" >> "make-distclean" || \
 					echo "$item" >> "make-distclean" #  || exit 1
 				((C++))
 			done
 		fi
 		write_distclean >> "make-distclean"
-		
 		
 		if [ "true" = "${doRef:-false}" ]
 		then	echo >> "make-install"
@@ -516,7 +519,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			if [ "$index" = "prefix" ] && ! $etc_done
 			then	# Do special handling
 					[ "~" = "${tmp:0:1}" ] && tmp="${tmp/~/$HOME}"
-					if [ "${tmp:0:${#HOME}}" = "$HOME" ] #|| [ "$tmp" ~= ^"~" ]
+					if [ "${tmp:0:${#HOME}}" = "$HOME" ]
 					then	is_at_home=true
 						install_prefix=""
 						prefix_home="${{tmp/~/$HOME}/$HOME}"
@@ -542,23 +545,31 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		printf '%s\n' "Please provide these commands before installing $APP!"  && \
 		printf '::-->> %s\n' ${missing} && \
 		exit 1
-	
 #
 #	Output
 #
 	if $doTarball
-	then	tmp_p=$(pwd)
-		tmp_dir=$(dirname $tmp_p)
+	then	exclude_list="make-distclean"
+		for ex in "${IGNORE[@]}";do exclude_list+=" $ex";done
+		opt_exclude=""
+		for item in $exclude_list;do opt_exclude+=" --exclude-ignore=$item";done
+		
+		tmp_p="${PWD:-$(pwd)}"
+		tmp_dir="$(dirname $tmp_p)"
 		[ -z "$APP_VER" ] && \
 			VERSION="" || \
 			VERSION="_${APP_VER}"
-		./configure --prefix="${FHS[prefix]}"
+		#./configure --prefix="${FHS[prefix]}"
 		for t in "${PRIOR[@]}"
 		do 	(set -x ; $t )
 		done
 		tarball="../${APP}$VERSION.tar.gz"
-		tar -acf "$tarball" * && \
+		set -x
+		tar 	-acf "$tarball" \
+			--hard-dereference \
+			$opt_exclude * && \
 			echo "Successfully created tarball ${tarball}!"
+		set +x
 	else	echo
 		echo "The installation script has been configured to ${FHS[prefix]}."
 		echo "To install \"$APP\" now, please execute: '${install_prefix}./make-install'"

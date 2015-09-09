@@ -168,14 +168,15 @@ One can also pass multiple entries to a target:
 
 @section Tweaking / Additional Tasks
 
-There are 3 arrays you can assign scripts or commands to:
+There are 6 arrays you can assign files, scripts or commands to:
 
 @table @code
 @item @bullet{} PREPARE
 @item @bullet{} PRIOR
 @item @bullet{} POST
 @item @bullet{} REMOVE
-@item @bullet{} CLEAM
+@item @bullet{} CLEAN
+@item @bullet{} IGNORE
 @end table
 
 @subsection PREPARE
@@ -205,6 +206,10 @@ The tasks of remove will be executed during @b {./make-distclean}, and should be
 If an entry to the PRIOR array is a file, it will be called by @b {rm}.
 Otherwise the entry is expected to be a command, and will be executed as such.
 
+@subsection IGNORE
+This task will be only executed upon @b {./configure --tarball [optons]},
+and is ment to help prepare a tarball for family or friends.
+Be sure to have the proper commands in PREPARE.
 
 See the output of:
 @example
