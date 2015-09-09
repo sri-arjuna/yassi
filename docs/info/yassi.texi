@@ -65,12 +65,9 @@ according to a single configuration file.
 Once the file 'configure' is placed within your project directory and the file 'configure.cfg' was created too,
 it will generate these commands:
 @table @code
-@item
-@bullet{} make-install
-@item
-@bullet{} make-uninstall
-@item
-@bullet{}  make-distclean
+@item @bullet{} make-install
+@item @bullet{} make-uninstall
+@item @bullet{}  make-distclean
 @end table
 
 @b{HINT:} Install YASSI to your system to use installed 'configure' rather than the 'configure' provided by the project.
@@ -174,20 +171,40 @@ One can also pass multiple entries to a target:
 There are 3 arrays you can assign scripts or commands to:
 
 @table @code
-@item 
-@bullet{} PRIOR
-@item 
-@bullet{} POST
-@item 
-@bullet{} REMOVE
+@item @bullet{} PREPARE
+@item @bullet{} PRIOR
+@item @bullet{} POST
+@item @bullet{} REMOVE
+@item @bullet{} CLEAM
 @end table
 
-
-If an entry to the PRIOR array is a file, it will be called by sh.
+@subsection PREPARE
+The items of the PREPARE array will be executed during the @b {./configure} process.
+If an entry to the PRIOR array is a file, it will be called by @b {sh}.
 Otherwise the entry is expected to be a command, and will be executed as such.
 
-Obviously, PRIOR items will be executed before the installation, 
-POST after the installation, and REMOVE when unstinstalling.
+Also, if you need or want to reditribute such a package by @c {./configure --tarball --prefix=/usr}, tasks done during PREPARE may use applications, that the end-system may not have.
+
+@subsection PRIOR
+The items of the PREPARE array will be executed before the actual install happens, but during @b {./make-install} process
+If an entry to the PRIOR array is a file, it will be called by @b {sh}.
+Otherwise the entry is expected to be a command, and will be executed as such.
+
+@subsection POST
+Very much identical to PRIOR, just right after the regular installation.
+If an entry to the PRIOR array is a file, it will be called by @b {sh}.
+Otherwise the entry is expected to be a command, and will be executed as such.
+
+@subsection REMOVE
+The tasks of remove will be executed during @b {./make-uninstall}, and should be used to remove items created during @b {PRIOR}.
+If an entry to the PRIOR array is a file, it will be called by @b {rm}.
+Otherwise the entry is expected to be a command, and will be executed as such.
+
+@subsection CLEAN
+The tasks of remove will be executed during @b {./make-distclean}, and should be used to remove items created during @b {PREPARE}.
+If an entry to the PRIOR array is a file, it will be called by @b {rm}.
+Otherwise the entry is expected to be a command, and will be executed as such.
+
 
 See the output of:
 @example
