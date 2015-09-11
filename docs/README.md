@@ -1,24 +1,19 @@
-Yet Another Simple Script Installation (yassi)
+YASSI (Yet Another Simple Script Installation)
 ==============================================
 
+What is it?
+-----------
 
-What does it do?
-----------------
-
-Inspired by GNU Autoconf & Automake, but got quite overhelmed by its power, 
-so i wrote this to ease the task of writing repeative installation handlers.
-
-It is a simple installer, based upon a simple config file usage.
-Therefor, it only places the files, you have to take care previously about their permission and preparation.
+In _one_ word: **an installer**
 
 
-
-What is it for?
+Target Audience
 ---------------
 
-It is for small projects, or script based projects that do not require to be complied for a specific architecture, 
-or contain just plain text files or only multimedia binaries.
+If you have projects that do not need to be compiled, but might need small preparations.
+As example, if you have a scripted project that requires some small preparations like texinfo or txt2man (but not limited to these).
 
+It aims to become an easy to use installer for non-binary-executable (arch-independant) projects.
 
 
 Why is the file not named 'yassi'?
@@ -30,138 +25,89 @@ generating a script named **make-install** to go conform with the great and powe
 Please, do use '[GNU Autoconf](http://www.gnu.org/software/autoconf/autoconf.html)' if you must compile your project!
 
 
+Pro & Contra
+------------
 
-What does it require?
----------------------
+**Pro**:
+
+1. It only uses a single configuration file
+2. It is highly configurable
+3. Its usage/behaviour is similar as with GNU Autotools (to the enduser)
+4. It provides 2 different sample configurations (./configure --sample|--sample-full)
+5. Once **./configure --prefix=/usr** is executed, it generates 4 files:
+	* make-distclean, removes the just created files
+	* make-install, installs the project/package
+	* make-uninstall, removes the installed project/package
+	* ${APP}\_dirs.conf, provides all the system dirs used
+6. Last but not least, the installation itself is ALOT faster!
+	
+
+**Contra**:
+
+1. It comes 'english only'
+
+
+Requirements
+------------
+
 * Shell (/bin/bash and /bin/sh)
 * awk, grep, sed
-* https://github.com/sri-arjuna/
-* you to create a configure.cfg
-* (root access (for default prefix: /usr/local))
-
-You may choose ~/.local or $HOME/local as prefix, 
-and YASSI (configure) will then create the **make-install** and **make-uninstall** for that location, so no root access will be required as well.
-So, as you see, even for personal installations, this is highly convenient as well.
 
 
-
-
-Configure Syntax
+Installing YASSI
 ----------------
 
-See the latest samples by:
+First of all, you need to get the files, either by...
 
-	./configure --sample
-	./configure --sample-full
+**GIT**:
 
-There are 3 **APP** variables:
+	cd ~/Projects
+	git clone git clone https://github.com/sri-arjuna/yassi.git yassi
+	
+**CURL**:
+	
+	curl -Lo yassi.zip https://github.com/sri-arjuna/yassi/archive/master.zip
+	unzip yassi
+	mv yassi-master yassi && rm -f yassi.zip
+	
 
-* APP, which provides the application name for the DATADIR
-* APP\_VER, which provides the current version, use (not required) by the **--tarball** option.
-* APP\_DIR, change the default (without arguments/options) dir
+Then you need to apply it to your project
 
-Each of the _--\*dir_-options provides its name in as variable in CAPS.
+	cd ~/Projects/ProjectA
+	cp ../yassi/configure .
+	./configure --sample > configure.cfg
+	${EDITOR:-vi} configure.cfg
+	
+Or if you want to read the info file, actualy install it by itself.
 
-So, if you want to place your files in what would be _--bindir=_, simply use _BINDIR=_ within the **configure.cfg**
+	cd ~/Projects/yassi
+	./configure --prefix=$HOME/.local
+	./make-install
+	info yassi
 
-Please see **--help** output, to figure your target variable.
+To do an uninstallation:
 
-There are 4 different types of assignments:
+	cd ~/Projects/yassi
+	./make-uninstall
+	
 
-* Everything of a directory (**=docs**)
-* Single files (**=data/file5.dat**)
-* Single directories (**=./somedir**)
-* Multiple entries (**="extra/file1.txt ./somedir**)
+Examples
+--------
 
-You even may pass an astrerix to 'limit' the files.
-
-Example:
-
-	MAN1DIR=mans/*.1
-	MAN8DIR=mans/*.8
-
-Please be aware to not quote any single entry.
-
-Only quote assignments with multiple items. (asterix (\*) is a single entry and 'must not'! be quoted)
-
-
-
-$APP\_dirs.conf:
-----------------
-
-To create the **'make-\*'** scripts, a this file is used to save the generated paths.
-
-If your projects provides more than just docs and scripts, this is very much the case, 
-then you might want to use:
-
-	doRef=true
-
-As this will save that 'path configuration' used for the project to /etc/$APP.conf, 
-so you can refer from your scripts to that file, to know where all the other files are installed.
-
-
-
-Specials:
----------
-
-To customize the experience for your users, and after you made sure the (un-)installation script works,
-you might want to add your contact info, or a place where people could report bugs about your software.
-
-Simply add:
-
-* BUGS=\* ; Will provide a text to send an email to.
-* ISSUE=http://\* ; to provide an URL users can visit to report bugs.
-
-
-Very often one might need to prepare some files or change them after installation.
-
-If you have such task, consider yourself skilled enough to handle this. ;)
-
-To complete such tasks, **YASSI** provides the use of 3 different arrays:
-
-* PRIOR, things done after writing the REFERENCE file
-* POST, things done after installation
-* REMOVE, things done during uninstall.
-
-As these are arrays, you will have to assign the values according to BASH syntax, and follow proper escape sequences.
-
-You might want to know that for all the 3 arrays, the variables provided by the **REFERENCE** file shoould be available/usable.
-
-Example:
-
-* PRIOR[0]="echo \"Hello \$USER, you\'re installing $APP to $BINDIR.\""
-
-
-Example configurations:
+These are some free script projects of mine using YASSI:
 
 * [yassi-example](https://github.com/sri-arjuna/yassi-example)
-
-
-And my other projects using this:
-
+* [VHS (Video Handler Script)](https://github.com/sri-arjuna/vhs)
 * [connect](https://github.com/sri-arjuna/connect)
 * [dev-scripts](https://github.com/sri-arjuna/dev-scripts)
 
 
-
-Make-files
+Learn more
 ----------
 
-After you did run something like:
+By reading: [docs/USAGE.md](docs/USAGE.md)
 
-	./configure --prefix=/usr
-
-you will see, there are 3 new files in the path, all starting by **make-**.
-
-* make-distclean, removes the just created files
-* make-install, installs the project/package
-* make-uninstall, removes the installed project/package
-
-
-Other:
-------
-
-[Youtube howto](https://youtu.be/KhuariqAL2k), from empty to project to install and uninstall in ~10minutes.
+Or watching a [Youtube howto](https://youtu.be/KhuariqAL2k), from an empty to project to install and uninstall in ~10minutes.
 
 If you like YASSI, you might like [TUI](https://github.com/sri-arjuna/tui) as well.
 
