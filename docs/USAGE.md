@@ -82,5 +82,5 @@ You might want to know that for all the 3 arrays, the variables provided by the 
 
 Example:
 
-* PRIOR[0]="echo \"Hello \$USER, you\'re installing $APP to $BINDIR.\""
+	PRIOR[0]="echo \"Hello \$USER, you\'re installing $APP to $BINDIR.\""
 
