@@ -1,3 +1,7 @@
+2015.09.21 - Simon Arjuna Erat - erat.simon@gmail.com - 1.0.2
+* make-install: Fixed symlink creation
+* make-install: Fixed 'sudo' requiremennt if chroot/prefix is /home or /Users
+
 2015.09.21 - Simon Arjuna Erat - erat.simon@gmail.com - 1.0
 * Added '--chroot DIR' for packaging environments (eg: aur, deb, rpm)
 * PREPARE array executes commands while processing configure.
