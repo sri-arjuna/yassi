@@ -1,10 +1,11 @@
-YASSI (Yet Another Simple Script Installation)
-==============================================
+YASSI 1.0
+=========
 
 What is it?
 -----------
 
 In _one_ word: **an installer**
+Which is an acronym for: Yet Another Simple Script Installer
 
 
 Target Audience
@@ -38,13 +39,14 @@ Pro & Contra
 	* make-distclean, removes the just created files
 	* make-install, installs the project/package
 	* make-uninstall, removes the installed project/package
-	* ${APP}\_dirs.conf, provides all the system dirs used
+	* ${APP}\_dirs.conf, provides all the system dirs used, and can be copied to SYSCONFDIR automaticly
 6. Last but not least, the installation itself is ALOT faster!
 	
 
 **Contra**:
 
 1. It comes 'english only'
+2. Tweaking requires know how and where to escape used variables
 
 
 Requirements

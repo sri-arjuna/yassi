@@ -48,7 +48,7 @@ then you might want to use:
 
 	doRef=true
 
-As this will save that 'path configuration' used for the project to /etc/$APP.conf or $HOME/.local/etc, 
+As this will save that 'path configuration' used for the project to $/etc/$APP.conf or $HOME/.local/etc, 
 so you can refer from your scripts to that file, to know where all the other files are installed.
 
 
@@ -84,3 +84,26 @@ Example:
 
 	PRIOR[0]="echo \"Hello \$USER, you\'re installing $APP to $BINDIR.\""
 
+
+Packaging:
+----------
+
+There are two kinds of packages:
+* tarballs
+* distro dependant
+
+For each approach YASSI has an according solution.
+
+For the tarball, that is the easiest part, simply pass all arguments to configure, and see the created tarball in its top dir.
+As in:
+
+	./configure --prefix=/usr --tarball
+	
+For the distro dependant approach, such as (but not limited to) *aur, deb, rpm*, you'll probably face buildroots and such.
+For that matter you can pass a chroot, so the files are getting copied at their proper place, without confusing the prefix.
+
+	./configure --chroot=$HOME/tmp/buildroot --prefix=/usr
+
+Using that approach, you could also install an application to a mounted but not 'loged in' chroot.
+
+	./configure --chroot=/mnt/my_other_linux_root_partition --prefix=/usr
