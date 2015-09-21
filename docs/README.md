@@ -5,6 +5,7 @@ What is it?
 -----------
 
 In _one_ word: **an installer**
+
 Which is an acronym for: Yet Another Simple Script Installer
 
 
