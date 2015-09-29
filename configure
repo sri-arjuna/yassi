@@ -92,7 +92,7 @@
 		#	Project Info
 		#
 		 	APP=projectname
-		 	APP_REQUIRES="awk bash grep sed"
+		 	APP_REQUIRES="gawk bash grep sed"
 		#
 		#	Targets
 		#
@@ -112,20 +112,28 @@
 	# Prints an advanced sample configure.cfg
 	# and exits
 		cat <<-EOF
+		#!/usr/bin/env bash
 		#
 		#	Project Info
 		#
 		 	# Used for /usr/share/\$APP & /usr/share/doc/\$APP
 		 	APP=projectname
-		 	APP_REQUIRES="awk bash grep sed"
+		 	# This is required to run the script properly
+		 	APP_REQUIRES="gawk bash grep sed"
+		 	# This is required only until it is installed
 		 	CFG_REQUIRES="git texi2any txt2man"
-		 	
+			
 		 	# Used for helpscreen & tarball
 		 	APP_VER=0.1
-		 	
+			
+		 	# Contact
+		 	APP_AUTHOR="${USER_NAME:-USER}"
+		 	APP_EMAIL="${USER_EMAIL:-your@email.com}"
+		 	APP_SITE="https://github.com"
+			
 		 	# If set, overwrites the default PREFIX (/usr/local) to assigned value.
 		 	#APP_DIR=~/.local
-		 	
+			
 		 	# Set true to install the reference file to $PREFIX/$SYSCONFDIR/\$APP.conf
 		 	# This will automaticly be uninstalled if set to true, no extra work.
 		 	#doRef=false
@@ -140,8 +148,10 @@
 		#
 		#	Tasks prior to installation, but after tarball
 		#
-		 	# Only install if the current system does not provide TUI
-		 	PRIOR[0]="! which tuirc 1>/dev/zero 2>/dev/zero && cd tui && ./configure --prefix=${prefix} && (./make-install || make install) && cd .. "
+		 	# Only install if the current system does not provide TUI, simply remove this if you dont need it
+		 	PRIOR[0]="! which tuirc 1>/dev/zero 2>/dev/zero && cd tui && ./configure --prefix=\${prefix} && ./make-install && cd .. "
+		 	PRIOR[1]="echo 'Some variable examples:'"
+		 	PRIOR[2]="printf '* %s\n' \"CHROOT=\\\$CHROOT\" \"prefix=\\\$prefix\" \"SYSCONFDIR=\\\$SYSCONFDIR\" \"DATADIR=\\\$DATADIR\";read -p 'press enter to continue' buffer"
 		#
 		#	Targets, where is what installed
 		#
@@ -152,15 +162,10 @@
 		 	HTMLDIR=docs/info/\$APP.html
 		 	DATADIR="./menu ./includes"
 		#
-		#	Task prior to the installation
-		#
-		 	PRIOR[0]="echo 'Some variable examples:'"
-		 	PRIOR[1]="printf '* %s\n' \"CHROOT=\\\$CHROOT\" \"prefix=\\\$prefix\" \"SYSCONFDIR=\\\$SYSCONFDIR\" \"DATADIR=\\\$DATADIR\";read -p 'press enter to continue' buffer"
-		#
 		#	Tasks post of installation
 		#
 		 	POST[0]=scripts/post_script1.sh
-		 	POST[1]="echo \"Thank you for choosing '\$APP'!\""
+		 	POST[1]="echo \"Thank you for installing '\$APP'!\""
 		#
 		#	Clean up what has been prepared 
 		#
@@ -170,13 +175,13 @@
 		#	Additional tasks for the uninstallation process
 		#
 		 	REMOVE[0]="tui-yesno 'Remove TUI as well?' && cd tui && \\
-		 			./make-uninstall && \
+		 			./make-uninstall && \\
 		 			./make-distclean && cd .."
 		#
 		#	Contact
 		#
-		 	BUGS="your@email.com"
-		 	ISSUE="https://github.com/sri-arjuna/yassi/issues"
+		 	BUGS="\$APP_EMAIL"
+		 	ISSUE="\$APP_SITE/\$APP_AUTHOR/\$APP/issues"
 		EOF
 		exit 0
 	}
@@ -259,9 +264,10 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		# Prints the copy commands
 		#
 			fullPath="${2/$CHROOT}"
+			target="${CHROOT}${FHS[${1,,}]}"
 			if [ -d "$2" ] && [ ! "./" = "${fullPath:0:2}" ]
 			then	# Its a directory, go recursive
-				echo "cp -ar \"${PWD:-$(pwd)}/$2/\"* \"${CHROOT}${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
+				echo "cp -ar \"${PWD:-$(pwd)}/$2/\"* \"$target\" || exit 1" | sed s,"//","/",g
 			else	tmp_check="${2##*/}"
 				check_char="${tmp_check:0:1}"
 				isAsterix=$(printf '%s' "$check_char" | grep -v '*' && echo false || echo true )
@@ -272,9 +278,10 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				esac
 				
 				if $isAsterix
-				then 	echo "cp -ar \"${PWD:-$(pwd)}/$(dirname ${2})/\"$tmp_check \"${CHROOT}${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
-				else	echo "cp -a \"${PWD:-$(pwd)}/$2\" \"${CHROOT}${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
+				then 	echo "cp -ar \"${PWD:-$(pwd)}/$(dirname ${2})/\"$tmp_check \"$target\" || exit 1" | sed s,"//","/",g
+				else	echo "cp -a \"${PWD:-$(pwd)}/$2\" \"$target\" || exit 1" | sed s,"//","/",g
 				fi
+				
 			fi
 		}
 		write_reference() { # INDEX
