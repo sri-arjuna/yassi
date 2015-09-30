@@ -3,9 +3,9 @@
 # ------------------------------------------------------------------------
 #
 #	Created:	2015.07.27
-#	Changed:	2015.09.21
+#	Changed:	2015.09.30
 	script_name=configure
-	script_version=1.0.2
+	script_version=1.1
 #
 #	Description:
 #		This script automaticly, according to passed options, 
@@ -270,7 +270,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				echo "cp -ar \"${PWD:-$(pwd)}/$2/\"* \"$target\" || exit 1" | sed s,"//","/",g
 			else	tmp_check="${2##*/}"
 				check_char="${tmp_check:0:1}"
-				isAsterix=$(printf '%s' "$check_char" | grep -v '*' && echo false || echo true )
+				isAsterix=$(printf '%s' "$check_char" | grep -q '*' && echo true || echo false )
 				
 				case "$isAsterix" in
 				true|false)	isAsterix=$isAsterix	;;
@@ -282,6 +282,9 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				else	echo "cp -a \"${PWD:-$(pwd)}/$2\" \"$target\" || exit 1" | sed s,"//","/",g
 				fi
 				
+				case "${1,,}" in
+				compldir)	echo "[ \${UID:-0} -eq 0 ] && chown 0:0 \"$target/${2##*/}\""
+				esac
 			fi
 		}
 		write_reference() { # INDEX
@@ -335,12 +338,11 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		do	echo "#!/usr/bin/env sh" > "make-$m"
 			if [ ! "$m" = "distclean" ] && ! $is_at_home 
 			then	echo "$CHROOT/$prefix"| grep -q -ve /home -ve /Users && \
-						printf '%s\n' \
-						"[ -z \$UID ] && UID=0" \
-						"[ \$UID -ne 0 ] && \\" \
-						"	echo \"To $m '$APP', root access is required.\" && \\" \
-						"	exit 99" >> "make-$m"
-			#else	echo "set -x" >> "make-$m"
+					printf '%s\n' \
+					"[ -z \$UID ] && UID=0" \
+					"[ \$UID -ne 0 ] && \\" \
+					"	echo \"To $m '$APP', root access is required.\" && \\" \
+					"	exit 99" >> "make-$m"
 			fi
 			echo "set -x" >> "make-$m"
 			chmod +x "make-$m"
@@ -354,7 +356,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		
 		# Write content of PRIOR tasks, if any
 		if [ -n "$(echo ${PRIOR[@]})" ]
-		then	source "$PWD/$REFERENCE"	# Just prefix yet
+		then	source "./$REFERENCE"	# Just prefix yet
 			C=0
 			echo >> "make-install"
 			while 	item="${PRIOR[$C]}"
@@ -387,11 +389,11 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				tmp_str="${FHS[${1,,}]}"
 				if [ ! -d "\${CHROOT}\${tmp_str%/*}" ]
 				then 	cd "\${CHROOT}/usr/.."
-				 	[ -d "\${CHROOT}/usr\${tmp_str%/*}" ] && \\
-				 		ln -sf "./usr\${tmp_str%/*}" "./\${tmp_str%/*}" || \\
-				 		mkdir -p "\${CHROOT}\$tmp_str"
+				 	[ -d "\${CHROOT}/usr\${tmp_str%/*}" ] && [ -n "\${tmp_str%/*}" ] && \\
+				 		ln -sf "usr\${tmp_str%/*}" "./\${tmp_str%/*}"
 				 	cd "\$OLDPWD"
 				fi
+				[ -d "\${CHROOT}\$tmp_str" ] || mkdir -p "\${CHROOT}\$tmp_str"
 				EOF
 				case "$num" in
 				1)	write_install "$index" "$tmp" >> "make-install"
@@ -457,7 +459,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			while 	item="${POST[$C]}"
 				[ ! -z "$item" ]
 			do 	[ -f "$item" ] && \
-					echo "sh ./$item" >> "make-install" || \
+					echo "bash ./$item" >> "make-install" || \
 					echo "$item" >> "make-install"
 				((C++))
 			done
