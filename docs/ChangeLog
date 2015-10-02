@@ -1,9 +1,12 @@
+2015-10-02 - Simon Arjuna Erat - erat.simon@gmail.com - 1.1.1
+* make-install, fixed empty compldir check/creation/copy
+
 2015.09.30 - Simon Arjuna Erat - erat.simon@gmail.com - 1.1
 * make-install, now really fixed the symlinking issue
 * --compldir, use either /etc/bash_completion.d or /usr/share/bash-completion/completions
 * --compldir, now works with multiple files
 * Updated: helpscreen, so it produces a nicer manpage
-* Added: --mandir, for those who want/need 'toplevel' access for the manpages.
+* Added: --mandir, for those who want/need 'toplevel access for the manpages.
 
 2015.09.21 - Simon Arjuna Erat - erat.simon@gmail.com - 1.0.2
 * make-install: Fixed symlink creation

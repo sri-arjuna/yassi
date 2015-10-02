@@ -19,9 +19,9 @@
 #
 #
 #	Created:	2015.07.27
-#	Changed:	2015.09.30
+#	Changed:	2015.10.02
 	script_name=configure
-	script_version=1.1
+	script_version=1.1.1
 #
 #	Description:
 #		This script automaticly, according to passed options, 
@@ -37,64 +37,51 @@
 #		and the calculation of the paths is done according to: http://www.pathname.com/fhs/
 #
 #		This is not about auto magic compiling,
-#		this is about simply placing files.
+#		this is about simply placing files - with some required extras.
 #
 #
 #	To report bugs or suggestions about YASSI (configure), please raise an issue on:
-#		https://github.com/sri-arjuna/yassi/issues
-#	or send me an email.
-#
-# ------------------------------------------------------------------------
-#
-# Copyright (c) 2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
-# All rights reserved.
-#
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published
-# by the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#		* https://github.com/sri-arjuna/yassi/issues
+#	or send me an email with the subject YASSI.
 #
 # ------------------------------------------------------------------------
 #
 #	Configfile / Option defaults
 #
-	APP=""
-	APP_VER=""
-	APP_REQUIRES=""
-	CFG_REQUIRES=""
-	BUGS=""
-	ISSUE=""
-	doRef=false
-	doTarball=false
-	is_at_home=false
+	APP="<APPNAME>"		# Non-space-name of the application
+	APP_AUTHOR=""		# Author of the script project
+	APP_EMAIL=""		# Email of the author
+	APP_SITE=""		# Homepage of $APP
+	APP_DIR="/usr/local"	# Default if no --prefix=DIR is passed
+	APP_VER=""		# Version of the APP
+	#APP_URL=""		# Url to download the package
+	APP_REQUIRES=""		# Commands required by APP
+	CFG_REQUIRES=""		# Commands required for PREPARE
+	BUGS=""			# Email adress to disply for bug repots
+	ISSUE=""		# Web adress to display for bug reports
+	doRef=false		# Copy the REFERENCE file to SYSCONFDIR?
+	doTarball=false		# Create a redist tarball?
+	is_at_home=false	# Is it a system or user installation?
 #
 #	Internal Variables
 #
 	unset FHS PREPARE PRIOR POST REMOVE
-	declare -A FHS
+	declare -A FHS		# This contains the directory strucutre by name
 	declare -a PREPARE	# This will be ran during ./configure --prefix=/usr
 	declare -a PRIOR	# This will be ran first during ./make-install
 	declare -a POST		# This will be ran last during ./make-install
 	declare -a REMOVE	# This will be ran during ./make-uninstall
 	declare -a CLEAN	# This will be ran during ./make-distclean
 	declare -a IGNORE	# These files will be ignored when running './configure --tarball --prefix=/usr'
-	AWK=\awk
-	GREP=\grep
-	SED=\sed
+	AWK=\awk		# Bypass aliases
+	GREP=\grep		# Bypass aliases
+	SED=\sed		# Bypass aliases
 	CONFIG="./$script_name.cfg"
 	which sudo 1>/dev/zero 2>/dev/zero && \
 		install_prefix="sudo " || \
 		install_prefix="su -c "
-	mandirs="$(echo man{1..9}dir)"
-	index_list="prefix bindir sbindir sysconfdir datarootdir datadir docdir htmldir infodir mandir $mandirs compldir sharedstatedir localstatedir"
+	mandirs="mandir $(echo man{1..9}dir)"
+	index_list="prefix bindir sbindir sysconfdir datarootdir datadir docdir htmldir infodir $mandirs compldir sharedstatedir localstatedir"
 	variable_list="";for i in $index_list;do variable_list+=" ${i^^}";done
 	TMP="$PWD/tmp.$$"
 	CHROOT=""
@@ -106,16 +93,18 @@
 	# Prints a sample configure.cfg
 	# and exits
 		cat <<-EOF
+		#!/usr/bin/env bash
 		#
 		#	Project Info
 		#
 		 	APP=projectname
+			APP_TITLE=""
 		 	APP_REQUIRES="gawk bash grep sed"
 		#
 		#	Targets
 		#
 		 	BINDIR=bin
-		 	DOCDIR=docs/[A-Z]*
+		 	DOCDIR=docs/[CRL]*
 		 	MAN1DIR=docs/man/\*.1
 		 	INFODIR=docs/info/\*.info
 		 	DATADIR="./templates ./extra"
@@ -223,7 +212,7 @@ OPTIONS
 	--sample-full		Prints an advanced sample 'configure.cfg' required by projects and exits
 	--tarball		Configures ${APP:-APPNAME}, runs PRIOR tasks and saves the folder as tarball, then exits
 	
-	--prefix DIR		Sets the prefix to DIR		(default: ${APP_DIR:-/usr/local})
+	--prefix DIR		Sets the prefix to DIR		(default: ${APP_DIR})
 	--chroot DIR		Sets the CHROOT to DIR		(for 'builddirs' or before chrooting into a partition)
 	
 	--bindir DIR		user executeables 		(\$prefix/bin)
@@ -339,11 +328,13 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				COMPLDIR)
 					# Check if it is a single file or a dir with possible multiple files
 					if [ -d "$tr" ]
-					then	for this_compl in "$tr/"*
+					then	echo " -- HERE" >&2
+						for this_compl in "$tr/"*
 						do 	tmp_compl="${this_compl/\$\{APP\}/$APP}"
 							echo "rm -f $DEST/${tmp_compl##*/}"
 						done
-					else	tr="${tr/\$\{APP\}/$APP}"
+					else	echo " -- THERE" >&2
+						tr="${tr/\$\{APP\}/$APP}"
 						echo "rm -f $DEST/${tr##*/}"
 					fi
 					;;
@@ -560,7 +551,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		etc_done=false
 		if [ -z "$tmp" ]
 		then	case "$index" in
-			prefix)		tmp="${APP_DIR:-/usr/local}"	;;
+			prefix)		tmp="${APP_DIR}"	;;
 			"bindir")	tmp="${FHS[prefix]}/bin"	;;
 			"sbindir")	tmp="${FHS[prefix]}/sbin"	;;
 			sysconfdir)	tmp_prefix="${FHS[prefix]}"
@@ -582,10 +573,13 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			docdir)		tmp="${FHS[datarootdir]}/doc/$APP" ;;
 			htmldir)	tmp="${FHS[docdir]}" ;;
 			compldir)	# Some systems have bash completion within the SYSCONFDIR
-					[ -d "${FHS[datarootdir]}/bash-completion/completions" ] && \
+					if [ -d "${FHS[datarootdir]}/bash-completion/completions" ]
+					then 	tmp="${FHS[datarootdir]}/bash-completion/completions"
+					elif [ -d "${FHS[sysconfdir]}/bash_completion.d" ]
+					then	tmp="${FHS[sysconfdir]}/bash_completion.d"
+					else # Use default as fallback
 						tmp="${FHS[datarootdir]}/bash-completion/completions"
-					[ -d "${FHS[sysconfdir]}/bash_completion.d" ] && \
-						tmp="${FHS[sysconfdir]}/bash_completion.d"	;;
+					fi ;;
 			sharedstatedir)	tmp="${FHS[prefix]}/com"	;;
 			localstatedir)	tmp="${FHS[prefix]}/var"	;;
 			esac
