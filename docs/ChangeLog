@@ -1,3 +1,14 @@
+2015-11-10
+* PREPARE becomes MAKE
+* Added TEXI, HTML, PS, PDF and DVI array
+
+2015-11-02 - Simon Arjuna Erat - erat.simon@gmail.com - 1.2
+* Added options for: dvidir, pdfdir and psdir
+* Added: --config so you can use multiple configurations with it
+* Added --write-makefile
+* Tasks: PREPARE are now written to ./make script
+
+
 2015-10-03 - Simon Arjuna Erat - erat.simon@gmail.com - 1.1.1
 * make-install, fixed empty compldir check/creation/copy
 * Added: Git code retrieval (APP_GIT)
