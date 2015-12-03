@@ -1,3 +1,9 @@
+2015-11-27
+* ./configure: YASSI updated, made make work (by removing .PHONY)
+
+2015-11-24
+* Added dir: appdir (for .desktop files)
+
 2015-11-10
 * PREPARE becomes MAKE
 * Added TEXI, HTML, PS, PDF and DVI array
