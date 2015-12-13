@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#
+#	Project Settings
+#
+	APP_NAME=yassi
+	APP_TITLE="Yet Another Simple Script Installer"
+	APP_VER="$(tmp=$(\grep _version= bin/configure);echo ${tmp/*=};tmp='')"
+	#APP_DIR=/usr
+	
+	# Configure and Install stuff
+	REQS[app]="gawk bash grep sed which"
+	REQS[opt]=txt2man
+	
+	# Contact
+	AUTHOR_NAME="Simon Arjuna Erat (sea)"
+	AUTHOR_EMAIL="erat.simon@gmail.com"
+	AUTHOR_HOMEPAGE="http://linux-scripter.blogspot.com"
+	BUGTRACKER="https://github.com/sri-arjuna/$APP_NAME/issue"
+#
+#	Prepare docs
+#
+	# The info doc is longer maintained
+	# DOCS[info]=docs/info/$APP_NAME.texi
+#
+#	Targets
+#
+	BINDIR=bin/configure
+	DOCDIR=docs/[CIR]*
+	#INFODIR=docs/info/$APP_NAME.info
+	DATADIR=./screenshots
+	

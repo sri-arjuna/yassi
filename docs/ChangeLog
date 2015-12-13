@@ -1,3 +1,16 @@
+2015-12-13
+* Made alot of smaller functions
+* Added --manpage for developers and packagers (optional: install txt2man for best experience).
+* Massive rework of variables, please see --manpage or --sample-full
+* Added: --sample-full-clean
+* Updated: --icondir, to install icons for *.desktop files
+* Updated: --tarball, or with makefile: make dist
+* Updated: --help output
+* Added more task arrays (DISTCLEAN IGNORE CHECK INSTALLDIRS MOSTLYCLEAN MAINTAINER_CLEAN)
+* Updated: Download project code if specified file is missing
+* Better support for Makefiles
+
+
 2015-11-27
 * ./configure: YASSI updated, made make work (by removing .PHONY)
 
