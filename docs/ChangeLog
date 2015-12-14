@@ -1,3 +1,10 @@
+2015-12-14 - YASSI 1.8.4 - sea
+* Updated: --tarball / make dist
+* Updated: Project file download, reckognizes $APP_NAME as dir, 
+*          and fixed default tarball name from '_' to '-' connector.
+* Copy uninstall script to DATADIR when installing to CHROOT/DESTDIR
+* Updated: write_file_closer
+
 2015-12-13
 * Made alot of smaller functions
 * Added --manpage for developers and packagers (optional: install txt2man for best experience).
