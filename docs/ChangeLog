@@ -10,7 +10,6 @@
 * Updated: Download project code if specified file is missing
 * Better support for Makefiles
 
-
 2015-11-27
 * ./configure: YASSI updated, made make work (by removing .PHONY)
 

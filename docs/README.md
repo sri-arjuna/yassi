@@ -1,21 +1,34 @@
-YASSI 1.0
-=========
+Yet Another Simple Script Installer (YASSI)
+===========================================
 
 What is it?
 -----------
 
-In _one_ word: **an installer**
-
-Which is an acronym for: Yet Another Simple Script Installer
+A highly configurable installer based on a single configuration file.
 
 
 Target Audience
 ---------------
 
-If you have projects that do not need to be compiled, but might need small preparations.
-As example, if you have a scripted project that requires some small preparations like texinfo or txt2man (but not limited to these).
+Developers, packagers and maintainers of projects that are either scripted or no binary executables, or want to have a clean project directory.
 
-It aims to become an easy to use installer for non-binary-executable (arch-independant) projects.
+
+Pro & Contra
+------------
+
+**Pro**:
+
+1. It only uses a single configuration file
+2. Hints to users for optional/recomended commands
+3. Provides autodownloader of project if a file or dir is missing
+4. Can provide Makefile syntax (for enduser)
+5. Last but not least, the installation of a project itself is [very fast!](./screenshots/yassi-is-fast.jpg)!
+
+**Contra**:
+
+1. It comes 'english only' (atm)
+2. Tweaking requires know how and where to escape used variables
+
 
 
 Why is the file not named 'yassi'?
@@ -27,72 +40,21 @@ generating a script named **make-install** to go conform with the great and powe
 Please, do use '[GNU Autoconf](http://www.gnu.org/software/autoconf/autoconf.html)' if you must compile your project!
 
 
-Pro & Contra
-------------
-
-**Pro**:
-
-1. It only uses a single configuration file
-2. It is highly configurable
-3. Its usage/behaviour is similar as with GNU Autotools (to the enduser)
-4. It provides 2 different sample configurations (./configure --sample|--sample-full)
-5. Once **./configure --prefix=/usr** is executed, it generates 4 files:
-	* make-distclean, removes the just created files
-	* make-install, installs the project/package
-	* make-uninstall, removes the installed project/package
-	* ${APP}\_dirs.conf, provides all the system dirs used, and can be copied to SYSCONFDIR automaticly
-6. Last but not least, the installation itself is ALOT faster!
-	
-
-**Contra**:
-
-1. It comes 'english only'
-2. Tweaking requires know how and where to escape used variables
-
 
 Requirements
 ------------
 
-* Shell (/bin/bash and /bin/sh)
-* awk, grep, sed
+* Shell (/bin/bash)
+* gawk, grep, sed, which
 
 
-Installing YASSI
-----------------
 
-First of all, you need to get the files, either by...
+Install YASSI
+-------------
 
-**GIT**:
+Please see docs/INSTALL.md for details.
 
-	cd ~/Projects
-	git clone git clone https://github.com/sri-arjuna/yassi.git yassi
-	
-**CURL**:
-	
-	curl -Lo yassi.zip https://github.com/sri-arjuna/yassi/archive/master.zip
-	unzip yassi
-	mv yassi-master yassi && rm -f yassi.zip
-	
 
-Then you need to apply it to your project
-
-	cd ~/Projects/ProjectA
-	cp ../yassi/configure .
-	./configure --sample > configure.cfg
-	${EDITOR:-vi} configure.cfg
-	
-Or if you want to read the info file, actualy install it by itself.
-
-	cd ~/Projects/yassi
-	./configure --prefix=$HOME/.local
-	./make-install
-	info yassi
-
-To do an uninstallation:
-
-	cd ~/Projects/yassi
-	./make-uninstall
-	
 
 Examples
 --------
@@ -103,6 +65,7 @@ These are some free script projects of mine using YASSI:
 * [VHS (Video Handler Script)](https://github.com/sri-arjuna/vhs)
 * [connect](https://github.com/sri-arjuna/connect)
 * [dev-scripts](https://github.com/sri-arjuna/dev-scripts)
+
 
 
 Learn more
