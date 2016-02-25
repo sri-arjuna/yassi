@@ -1,3 +1,7 @@
+2016-02-25 - YASSI 2.0.0-alpha-rc1
+* Missed to change back to original directory in 'task.mkdir'
+* The environment check filled DOCS already, had to reset again
+
 2016-02-04 - YASSI 2.0.0-alpha-rc0
 * IMPORTANT name change:
 * 	The variables GIT and SVN are now the command, to assign an url,
