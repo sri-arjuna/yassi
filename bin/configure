@@ -727,6 +727,11 @@ EOF
 			 	REQS[make]	This command is required to prepare the/your project files
 			 	REQS[opt]	This command can improve usablity for your project but is not essential
 
+			  Special: REQS_ONE[num]="list of 'semi-optional' commands"
+
+				REQS_ONE[0-99]	Commands of which just one is required of
+
+
 			 	Why this destinction?
 
 			 	In regards of the 'app' it is quite obvious, configure will exit with failure (1) if any of these commands is missing.
@@ -734,6 +739,8 @@ EOF
 			 	The same behaviour is for 'make', as that should contain a list of commands that are required to 'make' preparations for your projct before it gets installed.
 
 			 	'opt' on the other hand will only print a messsage to the user and let him know that it might be cool to install the missing commands of this list.
+
+				REQS_ONE only show if the user has no command of the list installed
 
 
 
