@@ -20,7 +20,7 @@
 #	Idea & Author:	Simon Arjuna Erat (sea), Switzerland
 #	Created:	2015.02.27
 #	Transformed:	2016.01.15
-#	Changed:	2020.01.20
+#	Changed:	2020.01.17
 	script_name="configure"
 	script_version="2.0.2"
 	script_bugtracker="https://github.com/sri-arjuna/yassi/issues"
@@ -469,26 +469,26 @@
 #	Sanity checks
 #
 	# Make sure we are in the right directory for the sanity check
+	dir.change "$CFG"
+	check.env.sanity
 	if [ -f "$CFG" ] && [ ! -z "$(<$CFG)" ]
 	then	check.env.config "$CFG" || exit 1
 	else	log.msg "$MSG_NO_CONFIG"
-			$TOUCH "$CFG"
-			$CAT > $CFG <<EOF
-APP_NAME=your-apps-name
-APP_TITLE="your apps title"
+			set -x
+			$ECHO "
+APP_NAME=your\-apps\-name
+APP_TITLE='your apps title'
 APP_VER=0.1
 APP_HOMEPAGE='http://your.homepage.adress'
 BINDIR=bin/${0/\.\/}
-EOF
-			#source "$CFG"
-			$0 --sample full > "$CFG.new"
-			$CAT "$CFG.new" > "$CFG"
-			$RM "$CFG.new"
-			log.msg "Created $CFG : Ret=$?"
-	fi
-	dir.change "$CFG"
-	check.env.sanity
+" >> "$CFG"
+	set +x
+	echo " kabdk dja"
 
+			$0 --sample full > "$CFG"
+			log.msg "Created $CFG : Ret=$?"
+			exit 1
+	fi
 	# Append debug info to log file, show if verbose
 	show.debug() {
 		liner
@@ -1609,7 +1609,7 @@ EOF
 				esac
 				((C++))
 			done
-			#echo $F &>>2
+			echo $F &>>2
 		}
 		write_file_install() { #
 		# Parse all variables and expand them

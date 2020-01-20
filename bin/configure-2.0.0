@@ -14,15 +14,15 @@
 # GNU General Public License for more details.
 #
 # For the license of this script, please see:
-# 	<http://www.gnu.org/licenses/gpl.txt>
+# 	<http://www.gnu.org/licenses/gpl.txt> 
 # ------------------------------------------------------------------------
 #
 #	Idea & Author:	Simon Arjuna Erat (sea), Switzerland
 #	Created:	2015.02.27
 #	Transformed:	2016.01.15
-#	Changed:	2020.01.20
+#	Changed:	2020.01.17
 	script_name="configure"
-	script_version="2.0.2"
+	script_version="2.0.1"
 	script_bugtracker="https://github.com/sri-arjuna/yassi/issues"
 #
 #	Yet Another Simple Script Installer
@@ -54,7 +54,7 @@
 #		* Makefile
 #
 #	Also it will install TUI (Text User Interface, framework for scripts),
-#	if 'doTUI=true', as I wrote YASSI to distribute TUI,
+#	if 'doTUI=true', as I wrote YASSI to distribute TUI, 
 #	and all my projects using TUI.
 #	I do hope it is as helpfull for you, as it is for me.
 #
@@ -70,10 +70,10 @@
 #	If you want to apply/use this to your project,
 #	please read: 		./configure --manpage
 #
-#	To report bugs or suggestions about YASSI (configure),
+#	To report bugs or suggestions about YASSI (configure), 
 #	* please raise an issue on:			https://github.com/sri-arjuna/yassi/issues
 #	* or leave a comment on my blog:		http://linux-scripter.blogspot.ch
-#
+#	
 # ------------------------------------------------------------------------
 #	Topic:				Around line:
 #	--------------------------------------------
@@ -109,7 +109,7 @@
 #
 #	Set command-tools help output to english and bypass alias'
 #	These are just the initial default settings
-#	In case it should not find a certain command,
+#	In case it should not find a certain command, 
 #	it can be passed manually as a last resort.
 #
 	export LC_ALL=C
@@ -134,7 +134,7 @@
 		TAR=${TAR:-\tar} \
 		TOUCH=${TOUCH:-\touch} \
 		WHICH=${WHICH:-\which}
-	# Internet commands
+	# Internet commands	
 	declare CURL=${CURL:-\curl} \
 		GIT=${GIT:-\git} \
 		PING=${PING:-\ping} \
@@ -215,16 +215,16 @@
 			MSG_YASSI_RUN_PROVIDED="Running provided"
 			MSG_YASSI_CODE_ERROR="If you experience any bugs or errors when executing './configure', 'make' or any other 'make-*' script, please raise an issue on: <$script_bugtracker>"
 			MSG_YASSI_MKDIR_ERROR="The directory you provided, could not be created!"
-			MSG_YASSI_EXIT_ERROR='Exit with $?'
-
+			
 			# Messages related to the user configure.yassi file
 			MSG_CFG_NO_NAME="Missing APP_NAME=appname..."
 			MSG_CANNOT_EXE_DIR='Cannot execute a directory: $1!'
 			MSG_CFG_LOADED="Loaded project:"
-
+			MSG_CFG_=""
+			
 			# Download tasks
 			MSG_DOWNLOAD_NO_CODE="Fatal error, could not retrieve project (${APP_NAME^^}) code!"
-
+			
 			# Tarball
 			MSG_TARBALL_GOOD="Successfully created tarball"
 			MSG_TARBALL_BAD="There was an error building the tarball"
@@ -247,7 +247,7 @@
 #
 #	Traps
 #
-	trap "log \"$MSG_YASSI_EXIT_ERROR\" >> $LOG;cd $PWD_ORG; [ -f $TPL ] && $RM $TPL ; trap -- 0 1" 0 1
+	trap "log \"Exit with $?\" >> $LOG;cd $PWD_ORG; [ -f $TPL ] && $RM $TPL ; trap -- 0 1" 0 1
 #
 #	With the apps set to default values, or to the values passed
 #	we shall now define all the functions, before we do a sanity check if one of them
@@ -271,7 +271,7 @@
 	check.env.fail() { msg "$MSG_CHECK_SANITY_FAIL ($1)" ; exit 1;}
 	check.env.config() { # FILE
 	# Parse the file configure.yassi (default)
-	#
+	# 
 		#echo $FUNCNAME
 		this="$1"
 		GQ="$GREP -q"
@@ -312,7 +312,7 @@
 					quit=true
 				else	quit=false
 					job.info "$MSG_CHECK_DL_NO_CODE ${item/download/curl\/wget}"
-
+					
 					case "${item/*_}" in
 					app_git)
 						[ -z "$GIT" ] && base_val=$(( $base_val - 1 )) || base_val=$(( $base_val + 1 ))
@@ -327,7 +327,7 @@
 					esac
 				fi
 			done
-
+			
 			( [ ! -e "$DOWNLOAD_IF_MISSING" ] && ! check.env.internet ) && { job.info "$MSG_CHECK_NO_INTERNET" ; return 1;}
 		fi
 		# For the source available, is the proper download tool available?
@@ -344,7 +344,7 @@
 		# 'which' is required for the later command fallback retrievals
 		! check.command.which $WHICH && check.env.fail "which"
 		# Is YASSI installed, or provided, and which version?
-		if [ "${0}" = "${BASE/$PWD/\.}/configure" ]
+		if [ "${0}" = "${BASE/$PWD/\.}/configure" ] 
 		then	str="$MSG_YASSI_RUN_INSTALLED"
 			YASSI="$0"
 		else	str="$MSG_YASSI_RUN_PROVIDED"
@@ -403,8 +403,8 @@
 	}
 	dir.change() { cd "$(dirname $1)" ; }
 	dir.make() { # /FULL/DIR
-		local DONE=""
-		local LB=$(msg "${1:1}" | $SED s,"/","\n",g)
+		DONE=""
+		LB=$(msg "${1:1}" | $SED s,"/","\n",g)
 		echo "$LB" | while read current
 		do	DONE+="/$current"
 			[ ! -d "$DONE" ] && $MKDIR "$DONE"
@@ -414,11 +414,11 @@
 	msg() { $ECHO "$1";}
 	msg.online() { $PRINT "$1";}
 	# LOG and print+log
-	log() { [ -f "$LOG" ] || ( $TOUCH "$LOG" && >"$LOG") ; msg "YASSI $1" >> "$LOG" ;}
+	log() { [ -f "$LOG" ] || ( touch "$LOG" && >"$LOG") ; msg "YASSI $1" >> "$LOG" ;}
 	log.msg() { msg "$1";log "$1";}
 	job.info() { ${beVerbose:-false} && log.msg "$1" || log "$1";}
 	liner() { msg "";	msg "-------------------------------------";msg "";}
-
+	
 #
 #	Special treatement
 #	Core display utilities
@@ -446,7 +446,7 @@
 	USER="${USER:-$(whoami)}"
 	HOME="$(eval ${ECHO} ~$USER)"
 	# Workaround if printf was used to get HOME
-	[ "printf" = "${ECHO:0:6}" ] && HOME="${HOME:0:${#HOME}-1}"
+	[ "printf" = "${ECHO:0:6}" ] && HOME="${HOME:0:${#HOME}-1}" 
 	LANG="${LANG:-en_GB.UTF-8}"
 	TERM="${TERM:-VT}"
 	BASE="${PWD:-$(pwd)}"
@@ -469,28 +469,14 @@
 #	Sanity checks
 #
 	# Make sure we are in the right directory for the sanity check
-	if [ -f "$CFG" ] && [ ! -z "$(<$CFG)" ]
-	then	check.env.config "$CFG" || exit 1
-	else	log.msg "$MSG_NO_CONFIG"
-			$TOUCH "$CFG"
-			$CAT > $CFG <<EOF
-APP_NAME=your-apps-name
-APP_TITLE="your apps title"
-APP_VER=0.1
-APP_HOMEPAGE='http://your.homepage.adress'
-BINDIR=bin/${0/\.\/}
-EOF
-			#source "$CFG"
-			$0 --sample full > "$CFG.new"
-			$CAT "$CFG.new" > "$CFG"
-			$RM "$CFG.new"
-			log.msg "Created $CFG : Ret=$?"
-	fi
 	dir.change "$CFG"
 	check.env.sanity
-
+	if [ -f "$CFG" ]
+	then	check.env.config "$CFG" || exit 1
+	else	job.info "$MSG_NO_CONFIG"
+	fi
 	# Append debug info to log file, show if verbose
-	show.debug() {
+	show.debug() { 
 		liner
 		# Show default variables expected by YASSI
 		for item in DEBUG USER HOME LANG TERM BASE PATH;do msg "$item:			${!item}";done
@@ -534,7 +520,7 @@ EOF
 	declare BUGTRACKER DOWNLOAD_IF_MISSING DOWNLOAD APP_GIT APP_SVN DEPS
 	# Dirs
 	declare mandirs="mandir $( msg man{1..9}dir)"
-	declare list_index="prefix bindir sbindir  sysconfdir datarootdir appdir icondir datadir docdir htmldir infodir $mandirs dvidir pdfdir psdir compldir sharedstatedir localstatedir rootdir bootdir efidir grubdir"
+	declare list_index="prefix bindir sbindir  sysconfdir datarootdir appdir icondir datadir docdir htmldir infodir $mandirs dvidir pdfdir psdir compldir /dstatedir localstatedir rootdir bootdir efidir grubdir"
 	declare list_variables="";for i in $list_index;do list_variables+=" ${i^^}";done
 	# Bools
 	declare doMakefile=false doGNU=false doTUI=false doRef=false
@@ -556,7 +542,7 @@ EOF
 		./configure, Version $script_version
 		Copyright (C) 2015 by Simon Arjuna Erat, Switzerland
 		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
+		
 		This is free software; you are free to change and redistribute it.
 		There is NO WARRANTY, to the extent permitted by law.
 
@@ -566,13 +552,13 @@ EOF
 	}
 	show.paragraph() { # NODE "CONTENT"
 	# Prints a helptext block
-	# that is usable as manpage
+	# that is usable as manpage 
 		printf "\n%s\n" "${1^^}" ; shift
 		for a in "${@}";do printf "\t%s\n" "$a";done
 	}
 	show.help() {
 	# Prints the helpscreen and exit with 0
-	#
+	# 
 		# If the APP_NAME provides a license (APP_LIC), prepare its display string
 		[ -n "$APP_LIC" ] && \
 			scr_lic="$(show.paragraph license "${APP_LIC}" " ")" || \
@@ -585,7 +571,7 @@ EOF
 		cat <<-EO_SCREEN
 		SYNOPSIS
 		  	./$script_name [options]
-
+		
 		DESCRIPTION
 		 	Routine to configure the installation of "${APP_TITLE:-${APP_NAME:-APPNAME}}$app_ver"
 		$scr_lic
@@ -594,47 +580,47 @@ EOF
 		 	--version		Shows the version of YASSI (./configure) and exits
 		 	--verbose		Prints all the action of the make* commands on the screen (V=0|1|2|3 ./configure [opts])
 		 	--debug			Like --verbose but also internal action how those files are created (V=2 ./configure [opts])
-
+		
 		 	--prefix DIR		Sets the prefix to DIR		(default: PREFIX=${APP_DIR})
-
-		DIRECTORIES
+			
+		DIRECTORIES	
 		 	--bindir DIR		user executeables 		(\$PREFIX/bin)
 		 	--sysconfdir DIR	read-only single-machine data 	(\$PREFIX/etc)
 		 	--datadir DIR		read-only architecture-independent data (\$DATAROOTDIR/${APP_NAME:-APPNAME})
 		 	--compldir DIR		Bash completion				(\$DATAROOTDIR/bash-completion/completions)
-
+		 	
 		 	--datarootdir DIR	read-only arch.-independent data root 	(\$PREFIX/share)
 		 	--localedir DIR		locale-dependent data			(\$DATAROOTDIR/locale)
 		 	--localstatedir	DIR	modifiable single-machine data		(\$PREFIX/var)
 		 	--sbindir DIR		admin executeables			(\$PREFIX/sbin)
 		 	--sharedstatedir DIR	modifiable architecture-independent	(\$PREFIX/com)
-
+			
 		DOCUMENTION
 		 	--docdir DIR		Project documentation root	(\$DATAROOTDIR/doc/${APP_NAME:-APPNAME})
 		 	--infodir DIR		Info documentation		(\$DATAROOTDIR/info)
-
+		 	
 		 	--mandir DIR		Basedir for manpages		(\$DATAROOTDIR/man)
 		 	--man[1-9]dir DIR	Specific manpage dirs		(\$MANDIR/man/man[1-9])
-
+		 	
 		 	--htmldir DIR		Project documentation root	(\$DOCDIR)
 		 	--dvidir DIR		Project documentation root	(\$DOCDIR)
 		 	--pdfdir DIR		Project documentation root	(\$DOCDIR)
 		 	--psdir DIR		Project documentation root	(\$DOCDIR)
-
+		 	
 		GUI
 		 	--appdir DIR		*.desktop files			(\$DATAROOTDIR/applications)
 		 	--icondir DIR		Icons for the desktop files	(\$DATAROOTDIR/icons)
-
+		 
 		REDISTRIBUTION
 		 	--chroot DIR		Sets the CHROOT to DIR		(for 'builddirs' or before chrooting into a partition)
 		 	--tarball		Equivalent of: "./configure [opts] && (./make-tarball || make dist)"
 		 	--makefile		Writes a dynamic Makefile according to created scripts
-
+		
 		DEVELOPERS
 		 	--sample [mini,full,clean,home]
 		 				Prints a basic sample, unless one of those arguments is passed
 		 	--manpage		Prints an advanced help screen for developers and packagers
-
+		 
 		NOTES
 		  Common Prefix Locations
 		  	Common places that are used as --prefix=DIR:
@@ -642,7 +628,7 @@ EOF
 		 	* /usr/local (default) or /opt
 		 	* \$HOME or \$HOME/usr
 		 	* \$HOME/local or \$HOME/.local
-
+		
 		EO_SCREEN
 		# Print messages according to passed configuration file
 		[ -n "$AUTHOR_NAME" ] && msg "The project \"${APP_NAME^^}\" was written by \"$AUTHOR_NAME\" <$AUTHOR_EMAIL> ($AUTHOR_HOMEPAGE)"
@@ -661,33 +647,33 @@ EOF
 		cat <<-EO_SCREEN
 			DESCRIPTION
 			 	This manpage shall explain how to write/modify a YASSI configuration file.
-
+				
 				This part of the manual is still in progress and also describes functionality that is still in developement or not yet stable.
-
+				
 				Be aware, YASSI is for architecture independant things like pictures/icons, info-/manpages, scripts or translations only.
-
+				
 				Further it handles the topcis like the full sample from top to down.
-
+				
 			SYNTAX
 			 	VARNAME=file		Assign this file to be installed to VARNAME
 			 	VARNAME=dir1		Assign only content of this dir to be install to VARNAME
 			 	VARNAME=./dir2		Assign this dir and all its content to be installed to VARNAME
-			 	VARNAME=dir3/[RI]*.md	Assign all files starting with capital 'R' and 'I' and ending with '.md' to be installed to VARNAME
+			 	VARNAME=dir3/[RI]*.md	Assign all files starting with capital 'R' and 'I' and ending with '.md' to be installed to VARNAME 
 			 	VARNAME="file dir ./dir dir2/[RI*.md]"	All above syntax can be combined within a list
-
+				
 				TASK_LIST[0]="entry"	Depending on the kind of the TASK_LIST[@]:
 							* Dirs/Files either get executed or removed
 							* Non found entries either gets removed or printed 'as is'
-
+			 	
 		 	Exceptions are: REQS[<TYPE>] and DEPS, please see details below.
-
+				
 			PROJECT INFO
 				This section explains most of the variables visible to the enduser by looking at --help.
-
-				APP_NAME	The unix shortname of the project.
+				  
+				APP_NAME	The unix shortname of the project. 
 						This name is also used for installation path
 				APP_VER		Set the project version, this is also used in/on:
-						  * the --help screen
+						  * the --help screen 
 						  * the tarball will contain version number
 						  * Can be used to keep $DOWNLOAD up-to-date (see: Advanced: Mini Installer)
 				APP_LIC		Set the license of your project
@@ -695,93 +681,93 @@ EOF
 				APP_PRJ		Is this project part of another project? What is its name?
 				APP_HOMEPAGE	Where to get the latest information about the project?
 				APP_DIR		Set another default path for ./configure (default /usr/local)
-
+				
 			AUTHOR AND MAINTAINER INFO
 				{AUTHOR,MAINTAINER}_NAME	Name of Author / Maintainer
 				{AUTHOR,MAINTAINER}_EMAIL	Email of Author / Maintainer
 				{AUTHOR,MAINTAINER}_HOMEPAGE	Homepage of Author / Maintainer
-
+				
 			PROJECT CONTACT
 				MAILLIST_NEWS	Newsletter for \$APP_NAME
 				MAILLIST_BUGS	Email to send bugs to
 				BUGTRACKER	Website to report bugs or raise issues
-
+			
 			BOOLEANS
 			  Syntax: doBOOLNAME=true
-
+			 	
 			 	There are a few optional bool'ish helpers, by default they are set to false:
-
+			 	
 			 	doMakefile	It is quite obvious what doMakefile does if it is set to true.
 			 	doGNU		If not provided by the author of the project, it adds some targets to the Makefile
-			 	doRef		installs the reference file of the used paths to /etc/appname.conf,
+			 	doRef		installs the reference file of the used paths to /etc/appname.conf, 
 			 			if enabled, the file is also uninstalled automaticly.
 			 			If you need to apply the systems absolute paths into your scripts, use the \$REF for your TASK's in your $CFG.
 			 	doVer		Some projects require to have the version in their path name 'doVer' does that.
 			 	doTUI		As I wrote YASSI for myself, this doTUI toogle will install the Text User Interface,
 			 			framework for scripts before the the actual install.
-
+			
 			REQS
 			  Syntax: REQS[<TYPE>]="list of required commands"
-
+			  
 			  	REQS[app]	Your project requires these commands and cannot run without them
 			 	REQS[make]	This command is required to prepare the/your project files
 			 	REQS[opt]	This command can improve usablity for your project but is not essential
-
+			 	
 			 	Why this destinction?
-
+			 	
 			 	In regards of the 'app' it is quite obvious, configure will exit with failure (1) if any of these commands is missing.
-
+			 	
 			 	The same behaviour is for 'make', as that should contain a list of commands that are required to 'make' preparations for your projct before it gets installed.
-
+			 	
 			 	'opt' on the other hand will only print a messsage to the user and let him know that it might be cool to install the missing commands of this list.
-
-
-
+			 	
+			 	
+			 
 			DIRECTORIES
 				This is where the actual magic happens...
-
+				
 				Basicly all files and directories assigned to any of the *DIR variables according to above provided SYNTAX,
 				will get installed to the directory represented by the VARNAME*DIR (eg: BINDIR).
-
+				
 				Please see: ./configure --help for a list of supported dirnames, note that the variables must be in CAPITAL letters.
-
+			
 			DOCS
 			 	Is a nice handler to create texi documents.
-
+			 	
 			 	Each of the following assignments will create a specific: make-doc-<TYPE> file.
-
-			 	Supported TYPE\'s are: info, html, pdf, dvi and ps.
-
+			 	
+			 	Supported TYPE's are: info, html, pdf, dvi and ps.
+			 	
 			 	DOCS[\$TYPE]=docs/texi/\$APP_NAME.texi	The created script will create the info document.
-
+			 	
 			 	DOCS[info]="docs/texi\$APP_NAME.texi docs/texi/other-node.texi" Also multiple entries are supported.
-
+			 	
 			 	There is no need to handle the 'texi2any' requirement, using DOCS[TYPE] will inform the user if it is missing.
 			 	Also, it will not allow the user to delete (./make-clean) these docs if 'texi2any' is not available.
-
+			 	
 			 	While this only takes care of creating these docs, you still need to place them for the installation:
-
+			 	
 			 		INFODIR=docs/tex/*.info
 			 		HTMLDIR=docs/tex/*.html
-
+			 	
 			 	Upon ./configure, ./make-doc-<TYPE> will be created.
-
+			 	
 			 	Upon ./make-doc-<TYPE>, it will check if 'texi2any' is avilable or not.
-
+			 	
 			 	Upon ./make-install-all, all available ./make-doc-* are executed before the actual ./make-install script.
-
-
+			 
+			 
 			ADVANCED
 			REDISTRIBUTION
 				--chroot=DIR	Install \$APP_NAME to DIR/\${PREFIX}
 						This setting can be overwritten by passing DESTIDR=DIR to make.
 				--tarball	Packages a tarball of the project dir from parent dir
 				--makefile	If a Makefile should be required or desired
-
+			
 			ADVANCED
 			MINI INSTALLER
 			 	These tools are nice if you want to share your application with a very low storage requirement.
-
+			 	
 			 	DOWNLOAD_IF_MISSING	Only if this DIR or FILE is not found, it triggers the other download preferences.
 			 				This DIR or FILE should NOT be created by ./make but exist and be required anyway.
 			 	APP_GIT			Set the GIT URL to clone from (prefered)
@@ -791,88 +777,88 @@ EOF
 			 				* \$APP_NAME
 			 				* \$APP_NAME-master
 			 				* \$APP_NAME-\$APP_VER
-
+			 	
 			 	For GIT and SVN downloads, a directory named "\$APP_NAME.src" will be created.
 			 	The TARBALL will be downloaded and exracted and the path checked.
-
+			 	
 			 	Afterwards YASSI changes its PWD to the new directory and continue installation.
-
+			
 			ADVANCED
 			TARBALL
-
+			
 			  A tarball is usally not required, unless you create them manual for upstream, now this can be partialy automated!
-
+			  
 			 	TARBALL 	Set alternate output file (default: ../\$APP_NAME[-\APP_VER].tar.gz)
 			 	TARBALL_DIR	Set custom output path, but let YASSI decide the filename
 			 	IGNORE  	Ignore these entries when creating the tarball
-
+			
 			 	A tarball can be created by either:
-
+			 	
 			 		./configure --tarball
 			 		./configure --makefile ; make dist
-
+			 
 			ADVANCED
 			VARIABLES PRESETS
 			 	These variables may be placed in front of ./configure and will influence the behavior of YASSI.
-
+			 	
 			 	CFG=file	This is the same as "./configure --conf file"
 			 	DESTDIR 	This is the same as ./configure --chroot=dir,
 			 			but it can also overwrite the previous set CHROOT by
 			 			passing "DESTDIR=dir make install"
 			 	TARBALL 	By default the created tarball will reside in the top dir, use this to change the location
-
-
+			
+			
 			ADVANCED
-			CUSTOM DIRECTORIES
+			CUSTOM DIRECTORIES	
 			 	You may define and use custom paths, be aware that you probably have to handle them your own.
-
+			 	
 			 	To define a new TARGET DIR, use:
-
+			 	
 			 		DIR_DEMO='$DATADIR/demo'
-
+			 		
 			 	Then to assing the installer to install files there:
-
+			 	
 			 		DEMO_DIR=demo/my*files
-
+			 	
 			 	NOTE: This is a hardcore example of what could have been:
-
+			 	
 			 		DATADIR=./demo
-
+			
 			ADVANCED
 			TASKS
 			 	If you need to generate some files, for example a file containing the absolute paths of the system it is installed to,
 			 	you can do that by adding one or multiple MAKE array entries:
-
+			 	
 			 		MAKE[0]="cat scripts/template.sh > bin/myapp"
-
+			 	
 			 	You could also let ./make execute other scripts:
-
+			 	
 			 		MAKE[1]=scripts/prepare.sh
-
+			 		
 			 	Or print a message to the user:
-
+			 	
 			 		MAKE[2]='echo "Hello $USER"'
-
+			 	
 			 	Likewise for PRIOR[0] and POST[0], but those will be executed before and after the actual installation of the TARGETs.
-
+			 	
 			 	The obvious exceptions are: UNINSTALL[0], CLEAN[0], DISTCLEAN[0], and IGNORE[0].
 			 	IGNORE is used for --tarball (make dist), the others obvious for their make-<COMMAND>s.
-
+			 
 			ADVANCED
 			DEPS
-
+			
 			  Syntax: DEPS="deps/first.yassi deps/second.yassi"
-
+			 
 			 	BETA IN PLAN
 			 	This will install each of the passed dependencies before the actual install.
-
+			 	
 			 	YASSI will change its PWD to each of the DEP files and the call its default routines to install this passed configuration.
-
-
+			
+			 	
 			AUTHOR
 			 	YASSI was started in early Feb 2015 by Simon Arjuna Erat from Switzerland.
-
-
+			 	
+			 	
 		EO_SCREEN
 	}
 	show.sample() { # [TYPE]
@@ -892,14 +878,14 @@ EOF
 			 #	AUTHOR_HOMEPAGE="mywebsite.web" # Optional, your personal homepage
 			 #	AUTHOR_NAME="My Name"		# Optional, Name of author
 			 #	AUTHOR_EMAIL="some@mail.web"	# Optional, Email of author
-
+			 
 			#
 			#	Default target dirs
 			#
 			 	BINDIR=bin			# All files in folder 'bin' will be installed to \$PREFIX/bin
 			 	SYSCONFDIR=myapp.conf		# Installs myapp.conf to \$PREFIX/etc
 			 	DATADIR="./lists ./templates"	# Copies both directories to \$PREFIX/share/myapp/{lists,templates}
-
+			 
 			EO_SCREEN
 			;;
 		full)	cat <<-EO_SCREEN
@@ -940,7 +926,7 @@ EOF
 			#	YASSI Booleans
 			#
 			 #	doMakefile=false	# Optional, Write a Makefile according to created scripts
-			 #	doGNU=false		# Optional, like doMakefile, but write additional TARGETs to the Makefile,
+			 #	doGNU=false		# Optional, like doMakefile, but write additional TARGETs to the Makefile, 
 			 #				# if the according scripts are not created by the $CFG
 			 #	doTUI=false		# Optional, Install TUI (BETA TODO)
 			 #	doRef=false		# Optional, Install \${APP_NAME}_dirs.conf to \$SYSCONFDIR/\$APP_NAME.conf
@@ -973,13 +959,13 @@ EOF
 			 #	LOCALEDIR=
 			 #	LOCALSTATEDIR=
 			 #	SHAREDSTATEDIR=
-
+			 
 			 	# GUI			# --> See "./configure --help" for their default paths
 			 #	APPDIR=			# Optional, Install *.desktop files
 			 #	ICONDIR=		# These dirs have subfolders, which you must provide as well
-
+			 
 			 #	# Docs
-			 	DOCDIR="[RCI]* docs"	# Installs all files with capital starting letters R, C or I,
+			 	DOCDIR="[RCI]* docs"	# Installs all files with capital starting letters R, C or I, 
 			 				# and all content of 'docs' to \$PREFIX/share/doc/\$APP_NAME
 			 #	INFODIR=		# Either precompiled (recomeded!) or/and as DOCS[info]=file.texi generated.
 			 #	HTMLDIR=		# Like INFODIR, as well for pdfdir, dvidir, psdir.
@@ -997,14 +983,14 @@ EOF
 			 #	APP_SVN=""			# Some still use this, goes also to ./\$APP_NAME.src
 			 #	DOWNLOAD=""		# Last resort to download a tarball, prefer curl over wget
 			 #	DOWNLOAD_DIR=""		# What is the name of the folder of the extracted tarball. (\$APP_NAME-{master,\$APP_VER} are automaticly reckognized)
-
+			 
 			#
 			#	Advanced: Tarball (--tarball ; make dist)
 			#
 			 #	TARBALL="\${HOME}/\${APP_NAME}.tar.gz" # Where to save the tarball? Default: ../\$APP_NAME.tar.gz -- ../\${APP_NAME}-\${APP_VER}.tar.gz
 			 #	TARBALL_DIR="\$HOME"	# Let YASSI create the filename, but save it here
 			 #	IGNORE[0]=".git"	# Besides Makefile + make*, which files should be ignored for tarball?
-
+			 
 			#
 			#	Advanced Tweakings
 			#
@@ -1022,10 +1008,10 @@ EOF
 			 	# Example
 			 # 	DIR_DEMO='$DATAROOTDIR/demos/$APP_NAME'
 			 # 	DEMO_DIR=mydata/*
-
+		
 			EO_SCREEN
 			;;
-		clean)
+		clean)	
 			# Show the full sample and remove all comments
 			show.sample full | sed s,"	#..*","",g
 			;;
@@ -1051,7 +1037,7 @@ EOF
 	}
 #
 #	Functions
-#
+#	
 	_mkdir() { # DIR
 	# Overwrite the shell_mkdir
 	# Make sure directory is created recursivly
@@ -1068,7 +1054,7 @@ EOF
 			# Relative path, dots are preserved
 			first=""
 			;;
-		"/")	# Absolute path,
+		"/")	# Absolute path, 
 			# make sure the leading dash is available
 			first="$FIRST"
 			;;
@@ -1076,12 +1062,12 @@ EOF
 			msg "$MSG_YASSI_MKDIR_ERROR $1"
 			return 1
 		esac
-
+		
 		this_is_done=""
 		for dir in $LIST;do
 			this_is_done+="${first}${dir}/"
 			[ -n "$first" ] && first=""
-			# Need to escape the escape symbol,
+			# Need to escape the escape symbol, 
 			# otherwise we call this function recursivly
 			[ -d "$this_is_done" ] || mkdir "$this_is_done"
 		done
@@ -1101,7 +1087,7 @@ EOF
 		get_it(){
 			ping -c1 8.8.8.8 2>/dev/null >&2 || \
 				{ echo "$MSG_NO_INTERNET" ; exit 1 ; }
-			if $WHICH $GIT 2>/dev/zero 1>/dev/zero
+			if $WHICH $GIT 2>/dev/zero 1>/dev/zero 
 			then	job.info "TUI - git" >> "$LOG"
 				if [ -d tui-master ]
 				then	cd tui-master
@@ -1112,10 +1098,10 @@ EOF
 					cd tui-master
 				fi
 				return $RET
-			elif $WHICH $CURL 2>/dev/zero 1>/dev/zero
+			elif $WHICH $CURL 2>/dev/zero 1>/dev/zero 
 			then	job.info "TUI - curl" >> "$LOG"
 				$CURL -o "${DOWNLOAD##*/}" "$DOWNLOAD"
-			elif $WHICH $WGET 2>/dev/zero 1>/dev/zero
+			elif $WHICH $WGET 2>/dev/zero 1>/dev/zero 
 			then	job.info "TUI - wget" >> "$LOG"
 				$WGET -O "${DOWNLOAD##*/}" "$DOWNLOAD"
 			else	job.info "$MSG_NO_DL_APP"
@@ -1139,7 +1125,7 @@ EOF
 		job.info "TUI - installing now..."
 		[ -z "${DESTDIR:-${FHS[chroot]}}" ] && \
 			$PWD/configure --prefix=${FHS[prefix]} || \
-			./configure -c $PWD/configure.yassi --prefix=${FHS[prefix]} --chroot=${FHS[chroot]}
+			./configure -c $PWD/configure.yassi --prefix=${FHS[prefix]} --chroot=${FHS[chroot]} 
 		cd ..
 		msg "(set -x;cd tui-master ; ./make)" >> ./make
 		msg "(set -x;cd tui-master ; ./make-install-all)" >> ./make-install
@@ -1150,11 +1136,11 @@ EOF
 		INFILE="$1"
 		DOCTYPE="${2:-info}"
 		OUTFILE=${INFILE/\.*/\.$DOCTYPE}
-
+		
 		job.info "DOCS:	INFILE=$INFILE" >> "$LOG"
 		job.info "DOCS:	DOCTYPE=$DOCTYPE" >> "$LOG"
 		job.info "DOCS:	OUTFILE=$OUTFILE" >> "$LOG"
-
+		
 		case "${DOCTYPE,,}" in
 		info)	msg "$TEXI -o \"$OUTFILE\" --no-split \"$INFILE\""
 			;;
@@ -1187,7 +1173,7 @@ EOF
 		then 	msg.log "$(eval $MSG_CANNOT_EXE_DIR)" >&2
 			exit 1
 		elif [ -f "$1" ]
-		then	if [ -x "$1" ]
+		then	if [ -x "$1" ] 
 			then	[ "/" = "${1:0:1}" ] && \
 					msg "\"$1\"" || msg "\"$PWD/$1\""
 			else	[ "/" = "${1:0:1}" ] && \
@@ -1196,25 +1182,22 @@ EOF
 		else	msg "$1"
 		fi
 	}
-	task.clean() {
+	task.clean() { 
 	# Remove the files that where created
 	# from 'make' or make 'html'
-		[ -f make-clean ] || return
+		[ -f make-clean ] || return 
 		texi_convert() { msg "${1%\.texi}.$2";}
 		msg "$WHICH $TEXI 2>/dev/zero 1>/dev/zero || exit 0" >> make-clean
-		for T in info html pdf dvi ps;do tData="${DOCS[$T]}"
+		for T in info html pdf dvi ps;do tData="${DOCS[$T]}" 
 			for item in $tData;do msg "$RM -f $(texi_convert "$item" "$T")" >> make-clean ;done
 		done
 	}
-	task.distclean() {
+	task.distclean() { 
 	# Remove all the files that where created by configure
 	#
-		for task in Makefile make* $REF #$LOG
+		for task in Makefile make* $REF $LOG
 		do	task.remover "$task"
 		done
-		# Just in case ./configure was executed more than once,
-		# so all the old log files get removed
-		msg "$RM -f ./configure.*.log"
 	}
 	task.dist() { #
 	# Packages the project dir without the items of IGNORE[@]
@@ -1224,23 +1207,23 @@ EOF
 		# Since we prepare the make-<files>, configure is no longer required
 		opt_exclude="" #"--exclude-ignore=configure"
 		for item in $exclude_list;do opt_exclude+=" --exclude-ignore=$item";done
-
+		
 		tmp_p="${PWD:-$(pwd)}"
 		tmp_dir="$(dirname $tmp_p)"
 		this=${tmp_p/$tmp_dir}
-
+		
 		[ -z "$APP_VER" ] && \
 			VERSION="" || \
 			VERSION="-${APP_VER}"
 		[ -z "$TARBALL_DIR" ] || TARBALL_DIR="${TARBALL_DIR}/"
 		# This is just as a failsafe and fallback
 		#[ ! -z "$TARBALL_DIR" ] && TARBALL="" && \
-		#	( [ -d "$TARBALL_DIR" ] || _mkdir "$TARBALL_DIR" )
-
+		#	( [ -d "$TARBALL_DIR" ] || _mkdir "$TARBALL_DIR" ) 
+		
 		cd ..
 		#if TARBALL has another path than TARBALL_DIR, that is okay this way
 		tarball="$(msg ${TARBALL:-${APP_NAME}$VERSION.tar.gz} | $SED s,\",,g )"
-		# Actually save this,
+		# Actually save this, 
 		$TAR 	-acf "${TARBALL_DIR}$tarball" \
 			--hard-dereference \
 			$opt_exclude "${this/\/}"
@@ -1257,12 +1240,12 @@ EOF
 	# And prints according function to file: make
 		#echo "TODO $FUNCNAME -- medium prio" >&2
 		is_there() { $WHICH "$1" 2>&1 1>/dev/zero; }
-
+		
 		# First do optionals
 		opts=""
 		for o in "${REQS[opt]}";do is_there "$o" || opts+=" $o";done
 		[ -z "$(msg $opts)" || (msg "$MSG_REQS_OPTS";msg $opts)
-
+		
 		# Continue with 'requires one of ...'
 		C=0 ; 	fatal=0
 		while 	[ $C -le ${#REQS_ONE[@]} ]
@@ -1270,17 +1253,17 @@ EOF
 		do
 			found=0
 			for req in ${REQS_ONE[$C]};do
-				is_there $req && found=$(($found + 1))
+				is_there $req && found=$(($found + 1)) 
 			done
 			[ $found -eq 0 ] && fatal=$(( $fatal + 1)) && \
 				echo "${MSG_REQS_ONE} ${REQS_ONE[$C]}"
 			((C++))
 		done
-		[ $fatal -gt 0 ] && exit 1
-
+		[ $fatal -gt 0 ] && exit 1 
+		
 		# Get the absolute required ones
 		[ -z "${REQS[app]}" ] && list="$REQS" || list="${REQS[app]} ${REQS[make]}"
-
+		
 		missing=""
 		for req in ${REQS[app]};do which $req 2>/dev/zero 1>&2 || missing+=" $req" ;done
 		if [ -z "$missing" ]
@@ -1337,9 +1320,9 @@ EOF
 		[ -z "$1" ] && return
 		create_dir="${FHS[${1,,}]}"
 		$GREP -q "create_dir=\"$create_dir\"" make-install && return 0
-		yassi.usr.check() { #
+		yassi.usr.check() { # 
 		# Check wether passed dir is in /usr but refers to /
-		#
+		# 
 			local oPWD="$PWD"
 			# Parent dir target does not exist
 			if [ ! -d "${CHROOT}${1%/*}" ]
@@ -1369,7 +1352,7 @@ EOF
 	#
 		INDEX="$1" ; shift
 		DEST="${CHROOT}${FHS[${INDEX,,}]}"
-
+		
 		for tr in ${@}
 		do	case "$INDEX" in
 			SBINDIR|BINDIR|MANDIR|MAN[1-9]DIR)
@@ -1417,13 +1400,13 @@ EOF
 	# Copy all CONTENT of INDEX, preserve same output dir!
 		INDEX="$1" ; shift ; ID=${INDEX^^}
 		DEST="\${CHROOT}${FHS[${INDEX,,}]}"
-
-
+		
+		
 		# This covers custom created target paths
 		tPath="$(get.dir ${INDEX})"
 		DEST="${DEST:-$tPath}"
 		[ "${1,,}" = root* ] && [ -z "$DEST" ] && DEST="/"
-
+		
 		# Parse each 'variable'
 		for item in "${@}"
 		do 	# Something to do?
@@ -1439,16 +1422,14 @@ EOF
 			elif [ -d "$item" ]
 			then	str="$item/*"
 			else	str="$tItem"
-			fi
+			fi	
 			# Install this the simple way
-			msg "_mkdir ${CHROOT}${DEST}" >> "make-install"
 			msg "$CP -ar ${str} \"$DEST\"" >> "make-install"
 		done
 	}
 	load.fhs() { #
-	# Assign default paths according to: http://www.pathname.com/fhs/ //// https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard
+	# Assign default paths according to: http://www.pathname.com/fhs/
 	# The 'appdir', 'icondir' and the 'man[1-9]dir's are 'homebrew' and non-standard, so are root, bootdir, efidir, grubdir and systemddir
-	# those are for convenience only, use with caution!
 		for index in $list_index
 		do 	tmp="${FHS[$index]}" ; etc_done=false
 			if [ -z "$tmp" ]
@@ -1502,6 +1483,7 @@ EOF
 				fi
 				FHS["$index"]="$tmp"
 				job.info "FHS $index = ${tmp/\/\//\/}"
+				echo $tmp >&2
 			fi
 		done
 		export FHS is_at_home
@@ -1512,9 +1494,7 @@ EOF
 		# Exit with error if $REF is not set
 		[ -z "$REF" ] && exit 1 ; >"$REF"
 		# Internal defaults
-		#set -x
 		log.msg "PREFIX=${FHS[prefix]}">>"$REF"
-		#set +x
 		for i in $list_variables;do [ -n "${!i}" ] && task.reference "${i^^}" >> "$REF";done
 		# Find user homebase
 		for that in / /Usr /Os /Sys /System /Var
@@ -1528,7 +1508,7 @@ EOF
 		[ -d "$HOMEBASE" ] || HOMEBASE=/home	## Using this as fallback
 		log.msg "HOMEBASE=$HOMEBASE" >> "$REF"
 		# Custom added dirs
-		for D in ${!DIR_*};do msg "$D=\"${!D}\" " >> "$REF";$MKDIR -p "${!D}";done
+		for D in ${!DIR_*};do msg "$D=\"${!D}\" " >> "$REF";done
 	}
 	write_file_docs() { #
 	# Checks if texi2any is installed and exit if not
@@ -1540,7 +1520,6 @@ EOF
 					"	echo \"$MSG_CHECK_NO_TEXI\" && \\" \
 					'	exit 1' \
 					>> make-doc-$type
-					## apostroph fix for gui editor '
 				for entry in ${DOCS[$type]};do
 					task.docs "$entry" "$type" >> make-doc-$type
 				done
@@ -1548,7 +1527,7 @@ EOF
 		done
 	}
 	write_file_headers() { #
-	# Creates the ./make* files
+	# Creates the ./make* files 
 	# and writes the according script headers
 		# Basic files
 		$TOUCH make make-{install,uninstall,distclean}
@@ -1563,7 +1542,7 @@ EOF
 		for t in info html dvi pdf ps;do
 			[ -n "$(msg ${DOCS[$t]})" ] && $TOUCH make-doc-$t
 		done
-		# Write shebang and make the scripts executable
+		# Write shebang and make the scripts executable		
 		for m in ./make*;do
 			printf '%s\n' "#!/usr/bin/env bash" \
 				"$($beVerbose && echo 'set -x')" \
@@ -1571,7 +1550,7 @@ EOF
 				"CHROOT=\"\${DESTDIR:-$CHROOT}\"" \
 				> "$m"
 			chmod +x "$m"
-
+			
 			# Write special content
 			case "$m" in
 			*install*)	msg "MSG_YASSI_MKDIR_ERROR=\"$MSG_YASSI_MKDIR_ERROR\"" >> "$m"
@@ -1597,7 +1576,7 @@ EOF
 	# Write the actual content of the scripts
 	#
 		write_array() { # FILE ARRAY
-		# Expand passed ARRAY and write
+		# Expand passed ARRAY and write 
 		# its content to passed FILE
 			C=0;F="$1" ; shift
 			while 	item="$(eval echo \${${1}[$C]})"
@@ -1609,11 +1588,10 @@ EOF
 				esac
 				((C++))
 			done
-			#echo $F &>>2
 		}
 		write_file_install() { #
 		# Parse all variables and expand them
-		#
+		# 
 			# Actualy write the make-{un,}install scripts
 			for index in $list_variables ${!DIR_*}
 			do	# Expand index
@@ -1650,7 +1628,7 @@ EOF
 					LC_ALL=C type task.dist | ${GREP} -v "is a" >> make-dist
 					echo task.dist >> make-dist	;;
 			"make-distclean")
-					write_array "$m" DISTCLEAN
+					write_array "$m" DISTCLEAN 
 					>> "make-distclean"
 					task.distclean >> "make-distclean";;
 			"make-mostlyclean")
@@ -1663,14 +1641,14 @@ EOF
 		done
 	}
 	write_file_closer() { #
-	# Saves the return code of the last command
+	# Saves the return code of the last command 
 	#
 		# Now close the files
 		for m in ./make*
 		do	$beVerbose && verbose="set +x" || verbose=""
 			printf '%s\n' "RET=\$?" "$( [ -n "$verbose" ] && msg $verbose)" "exit \$RET" >> "$m"
 		done
-
+		
 	}
 	write_file_make() { #
 	# Checks for existing scripts and adds them to the makefile
@@ -1695,7 +1673,7 @@ EOF
 				./make-install-all)
 					 	if [ -f "$task" ];then
 					 		printf '%s\n' "./make" ./make-doc-* "DESTDIR=\${DESTDIR} ./make-install" >> "$task"
-						fi
+						fi 
 						[ -f "$task" ] && printf '%s\n' "${task/\.\/make-}:" "	DESTDIR=\${DESTDIR} $task"  >> "$M"
 						 ;;
 				./make-install)	[ -f "$task" ] && printf '%s\n' "${task/*-}:" "	DESTDIR=\${DESTDIR} ${task}"  >> "$M" ;;
@@ -1704,7 +1682,7 @@ EOF
 				esac
 			done
 			echo "PHONY: $(echo make-*|sed s,make\-,,g|sed s,doc\-,install\-,g)" >> "$M"
-
+			
 		}
 	#
 	#	Action & Display
@@ -1774,7 +1752,7 @@ EOF
 				else 	show.manpage
 				fi
 				exit 0		;;
-		--verbose)	beVerbose=true
+		--verbose)	beVerbose=true	
 					shift		;;
 		--debug)	beVerbose=true
 					DEBUG=true
@@ -1783,7 +1761,7 @@ EOF
 		esac
 	done
 	#[ ! -f "$CFG" ] && echo "$MSG_NO_CONFIG" && exit 1 || source "$CFG"
-
+	
 	REF="./${APP_NAME}_dirs.conf"
 #
 #	Prepare Environment

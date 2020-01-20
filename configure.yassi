@@ -7,12 +7,11 @@
 	APP_VER="$(tmp=$(\grep _version= bin/configure);echo ${tmp/*=};tmp='')"
 	APP_HOMEPAGE="https://github.com/sri-arjuna/$APP_NAME/"
 	DOWNLOAD="$APP_HOMEPAGE/archive/master.zip"
-	#APP_DIR=/usr
-	
+
 	# Configure and Install stuff
 	REQS[app]="gawk bash grep sed which"
 	REQS[opt]=txt2man
-	
+
 	# Contact
 	AUTHOR_NAME="Simon Arjuna Erat (sea)"
 	AUTHOR_EMAIL="erat.simon@gmail.com"
@@ -30,4 +29,3 @@
 	DOCDIR=docs/[CIR]*
 	#INFODIR=docs/info/$APP_NAME.info
 	DATADIR=./screenshots
-	
