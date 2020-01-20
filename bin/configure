@@ -22,7 +22,7 @@
 #	Transformed:	2016.01.15
 #	Changed:	2020.01.20
 	script_name="configure"
-	script_version="2.0.2"
+	script_version="2.0.3"
 	script_bugtracker="https://github.com/sri-arjuna/yassi/issues"
 #
 #	Yet Another Simple Script Installer
@@ -645,7 +645,7 @@ EOF
 
 		EO_SCREEN
 		# Print messages according to passed configuration file
-		[ -n "$AUTHOR_NAME" ] && msg "The project \"${APP_NAME^^}\" was written by \"$AUTHOR_NAME\" <$AUTHOR_EMAIL> ($AUTHOR_HOMEPAGE)"
+		[ -n "$AUTHOR_NAME" ] && msg "The project \"${APP_NAME^^}\" was written by \"$AUTHOR_NAME\" $( [[ ! -z "$AUTHOR_EMAIL" ]] && $ECHO \<$AUTHOR_EMAIL\>) $( [[ ! -z "$AUTHOR_HOMEPAGE" ]] && $ECHO \($AUTHOR_HOMEPAGE\) )"
 		[ -n "$APP_HOMEPAGE" ] && msg "To learn more about \"${APP_TITLE:-$APP_NAME}\" visit: <$APP_HOMEPAGE>"
 		[ -n "$MAINTAINER_NAME" ] && msg "This package of \"${APP_TITLE:-$APP_NAME}\" is maintained by \"$MAINTAINER_NAME\" <$MAINTAINER_EMAIL> ($MAINTAINER_HOMEPAGE)"
 		[ -n "$MAILLIST_NEWS" ] && msg "To stay informed about \"${APP_NAME^^}\", subscribe to: <$MAILLIST_NEWS>"
