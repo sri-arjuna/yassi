@@ -14,7 +14,7 @@ all others are optional. However, it is recomended to use **APP_VERSION** as wel
 to avoid possible version confusions.
 
 If you want to reach out to the users of the script,
-you can provide your contact information with the **AUTHOR-\***
+you can provide your contact information with the **AUTHOR\_\***
 and/or the **MAINTAINER_\*** variables avilable.
 
 You can even provides **MAILLIST_{BUGS,NEWS}** and **BUGTRACKER** information.
@@ -96,12 +96,15 @@ But how do you do / use that? Well, it could look like:
 
     MAKE[0]="scripts/prepare.sh"
     MAKE[1]="scripts/gen-myfile.sh > ./myfile"
+    DISTCLEAN[0]="myfile"
 
 
-Just to be complete, the _${APP_NAME}\_dirs.conf_ file would be sourced by the _gen-myfile.sh_.
+Just to be complete, the _${APP_NAME}\_dirs.conf_ file is sourced by the _gen-myfile.sh_.
 In identical ways you can use PRIOR[@] POST[@] REMOVE[@] DISTCLEAN[@] CLEAN[@] IGNORE[@] UNINSTALL[@]
 
 These features are only required if you need to generate additional files during the make process.
+If you need to generate multiple files, it is recomended to generate them all into a single specific directory,
+from where they are included with a default BINDIR or SYSCONFDIR assignment, as that will handle the uninstall.
 
 
 
