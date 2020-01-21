@@ -4,7 +4,7 @@
 #
 	APP_NAME=yassi
 	APP_TITLE="Yet Another Simple Script Installer"
-	APP_VER="$(tmp=$(\grep _version= bin/configure);echo ${tmp/*=};tmp='')"
+	APP_VER=$(tmp=$(\grep _version= ./configure);printf ${tmp/*=};tmp='')
 	APP_HOMEPAGE="https://github.com/sri-arjuna/$APP_NAME/"
 	DOWNLOAD="$APP_HOMEPAGE/archive/master.zip"
 

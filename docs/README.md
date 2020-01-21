@@ -34,7 +34,7 @@ Pro & Contra
 Why is the file not named 'yassi'?
 ----------------------------------
 
-As people like to meet what they already know or expect, i named it **configure** instead, 
+As people like to meet what they already know or expect, i named it **configure** instead,
 generating a script named **make-install** to go conform with the great and powerfull standard '[GNU Autoconf](http://www.gnu.org/software/autoconf/autoconf.html)'.
 
 Please, do use '[GNU Autoconf](http://www.gnu.org/software/autoconf/autoconf.html)' if you must compile your project!
@@ -52,7 +52,10 @@ Requirements
 Install YASSI
 -------------
 
-Please see docs/INSTALL.md for details.
+You can install YASSI, but it is advised to do so only in the HOME,
+so you can test your own projects there too.
+
+    ./configure --prefix=$HOME/local/ ; ./make ; ./make-install
 
 
 

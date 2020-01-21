@@ -1,3 +1,8 @@
+2020-01-20 - YASSI 2.0.3
+* Ironized path creating on target
+* Added new entry for manpage
+* Added additional doc: USAGE.md
+
 2016-02-25 - YASSI 2.0.0-alpha-rc1
 * Missed to change back to original directory in 'task.mkdir'
 * The environment check filled DOCS already, had to reset again
@@ -12,14 +17,14 @@
 * Created YASSI configfile sanity check
 * Improved creation of directories
 * Creates a logfile now
-* Added wrapper for mkdir recursivly 
+* Added wrapper for mkdir recursivly
 
 2015-12-30 - YASSI 1.8.6 - sea
 * Now accecepts TARBALL_DIR=<TARGET_DIR> to save --tarball other than in ..
 
 2015-12-14 - YASSI 1.8.5 - sea
 * Updated: --tarball / make dist
-* Updated: Project file download, reckognizes $APP_NAME as dir, 
+* Updated: Project file download, reckognizes $APP_NAME as dir,
 *          and fixed default tarball name from '_' to '-' connector.
 * Copy uninstall script to DATADIR when installing to CHROOT/DESTDIR
 * Updated: write_file_closer
